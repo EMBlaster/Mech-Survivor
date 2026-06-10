@@ -10,4 +10,4 @@ base_armor = 80.0
 base_speed = 55.0
 base_weapons = Array[WeaponDef]([])
 xp_value = 25
-credits_value = 0
+credits_value = 5

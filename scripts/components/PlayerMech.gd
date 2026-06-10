@@ -15,7 +15,6 @@ func _ready() -> void:
 	$HealthComponent.died.connect(_on_died)
 	$Hitbox.body_entered.connect(_on_hitbox_body_entered)
 	$Hitbox.body_exited.connect(_on_hitbox_body_exited)
-	GameState.level_up.connect(_on_level_up)
 	rebuild_weapons()
 
 func _color_for_weight_class(weight_class: String) -> Color:
@@ -67,7 +66,4 @@ func _on_hitbox_body_exited(body: Node2D) -> void:
 	contacted_enemies.erase(body)
 
 func _on_died() -> void:
-	GameState.player_died.emit(GameState.calculate_weapon_salvage())
-
-func _on_level_up(_new_level: int) -> void:
-	get_tree().paused = true
+	GameState.player_died.emit(GameState.calculate_weapon_salvage() + GameState.run_credits)

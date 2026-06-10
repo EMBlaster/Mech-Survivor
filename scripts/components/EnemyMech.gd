@@ -1,6 +1,8 @@
 extends CharacterBody2D
 
 const EXPLOSION_SCENE: PackedScene = preload("res://scenes/fx/ExplosionFX.tscn")
+const REPAIR_PACK_SCENE: PackedScene = preload("res://scenes/game/RepairPack.tscn")
+const REPAIR_PACK_DROP_CHANCE: float = 0.25
 
 signal defeated(enemy_def: EnemyDef)
 
@@ -16,7 +18,9 @@ func setup(def: EnemyDef, diff_mult: float = 1.0) -> void:
 	enemy_def = def
 	difficulty_mult = diff_mult
 	current_armor = enemy_def.base_armor * difficulty_mult
-	speed = enemy_def.base_speed * difficulty_mult
+	# Armor scales fully with difficulty, but speed scales gently so late-game
+	# enemies don't outrun every mech.
+	speed = enemy_def.base_speed * sqrt(difficulty_mult)
 	$HealthBar.max_value = current_armor
 	$HealthBar.value = current_armor
 	_apply_visuals()
@@ -42,6 +46,8 @@ func _physics_process(_delta: float) -> void:
 		move_and_slide()
 
 func take_damage(amount: float) -> void:
+	if current_armor <= 0.0:
+		return
 	current_armor -= amount
 	$HealthBar.value = current_armor
 	if current_armor <= 0.0:
@@ -50,9 +56,13 @@ func take_damage(amount: float) -> void:
 func _die() -> void:
 	GameState.add_xp(enemy_def.xp_value)
 	if enemy_def.credits_value > 0:
-		SaveManager.add_credits(enemy_def.credits_value)
+		GameState.add_run_credits(enemy_def.credits_value)
 	var fx := EXPLOSION_SCENE.instantiate()
 	get_parent().add_child(fx)
 	fx.global_position = global_position
+	if randf() < REPAIR_PACK_DROP_CHANCE:
+		var pack := REPAIR_PACK_SCENE.instantiate()
+		pack.global_position = global_position
+		get_parent().call_deferred("add_child", pack)
 	defeated.emit(enemy_def)
 	queue_free()

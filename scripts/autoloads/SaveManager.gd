@@ -20,7 +20,7 @@ func load_save() -> void:
 		save()  # first run -- write defaults
 		return
 	credits = config.get_value("pilot", "credits", 0)
-	unlocked_mechs = config.get_value("pilot", "unlocked_mechs", ["Jenner JR7-D"])
+	unlocked_mechs.assign(config.get_value("pilot", "unlocked_mechs", ["Jenner JR7-D"]))
 
 func add_credits(amount: int) -> void:
 	credits += amount

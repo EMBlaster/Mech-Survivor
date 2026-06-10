@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/components/RepairPack.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_repair"]
+radius = 12.0
+
+[node name="RepairPack" type="Area2D"]
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.95, 0.75, 0.1, 1)
+
+[node name="CrossVertical" type="ColorRect" parent="."]
+offset_left = -3.0
+offset_top = -8.0
+offset_right = 3.0
+offset_bottom = 8.0
+mouse_filter = 2
+color = Color(0.15, 0.15, 0.15, 1)
+
+[node name="CrossHorizontal" type="ColorRect" parent="."]
+offset_left = -8.0
+offset_top = -3.0
+offset_right = 8.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(0.15, 0.15, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_repair")

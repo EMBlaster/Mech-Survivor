@@ -6,6 +6,8 @@ const ENEMY_SCENE: PackedScene = preload("res://scenes/game/EnemyMech.tscn")
 const SPAWN_RADIUS: float = 800.0
 const SCALING_INTERVAL: float = 60.0
 const SCALING_FACTOR: float = 1.15
+const FILLER_CHECK_INTERVAL: float = 1.0
+const FILLER_ARCHETYPES: Array[String] = ["scout", "brawler", "artillery"]
 
 const ARCHETYPE_DEFS := {
 	"scout": preload("res://resources/enemies/locust_lct1v.tres"),
@@ -17,24 +19,50 @@ const ARCHETYPE_DEFS := {
 var mission: MissionDef = null
 var elapsed_time: float = 0.0
 var pending_waves: Array[Dictionary] = []
+var filler_check_timer: float = 0.0
+var active_bosses: int = 0
 
 func setup(mission_def: MissionDef) -> void:
 	mission = mission_def
 	elapsed_time = 0.0
 	pending_waves = mission.wave_schedule.duplicate()
+	filler_check_timer = 0.0
+	active_bosses = 0
 
 func _process(delta: float) -> void:
 	if mission == null:
 		return
 	elapsed_time += delta
+
+	# While a boss is alive, hold off on any other spawns.
+	if active_bosses > 0:
+		return
+
 	var i := 0
 	while i < pending_waves.size():
 		var wave: Dictionary = pending_waves[i]
 		if elapsed_time >= float(wave["time"]):
 			_spawn_wave(wave)
 			pending_waves.remove_at(i)
+			if active_bosses > 0:
+				return
 		else:
 			i += 1
+
+	filler_check_timer += delta
+	if filler_check_timer >= FILLER_CHECK_INTERVAL:
+		filler_check_timer -= FILLER_CHECK_INTERVAL
+		_fill_to_cap()
+
+func _fill_to_cap() -> void:
+	var alive := get_tree().get_nodes_in_group("enemies").size()
+	if alive >= mission.max_alive_enemies:
+		return
+	var archetype: String = FILLER_ARCHETYPES[randi() % FILLER_ARCHETYPES.size()]
+	var def: EnemyDef = ARCHETYPE_DEFS.get(archetype)
+	var scaling_steps: float = floor(elapsed_time / SCALING_INTERVAL)
+	var diff_mult: float = mission.base_difficulty * pow(SCALING_FACTOR, scaling_steps)
+	_spawn_enemy(def, diff_mult)
 
 func _spawn_wave(wave: Dictionary) -> void:
 	var archetype: String = wave["archetype"]
@@ -59,4 +87,7 @@ func _spawn_enemy(def: EnemyDef, diff_mult: float) -> void:
 	enemy.global_position = spawn_pos
 	enemy.setup(def, diff_mult)
 	if def.archetype == "boss":
-		enemy.defeated.connect(func(_def): boss_defeated.emit())
+		active_bosses += 1
+		enemy.defeated.connect(func(_def):
+			active_bosses -= 1
+			boss_defeated.emit())

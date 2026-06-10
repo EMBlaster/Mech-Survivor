@@ -4,6 +4,10 @@ const PLAYER_SCENE: PackedScene = preload("res://scenes/game/PlayerMech.tscn")
 const DEFAULT_MECH: MechDef = preload("res://resources/mechs/jenner_jr7d.tres")
 const DEFAULT_MISSION: MissionDef = preload("res://resources/missions/mission1_recon_in_force.tres")
 
+const ZOOM_STEP: float = 0.1
+const MIN_ZOOM: float = 0.5
+const MAX_ZOOM: float = 1.5
+
 var player: CharacterBody2D = null
 var mission_ended: bool = false
 
@@ -24,11 +28,24 @@ func _process(delta: float) -> void:
 	if mission_ended:
 		return
 	GameState.mission_timer += delta
-	if is_instance_valid(player):
-		$Camera2D.global_position = player.global_position
 	if GameState.current_mission.win_condition == "survive" \
 			and GameState.mission_timer >= GameState.current_mission.duration_seconds:
 		_complete_mission()
+
+func _physics_process(_delta: float) -> void:
+	if is_instance_valid(player):
+		$Camera2D.global_position = player.global_position
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_adjust_zoom(ZOOM_STEP)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_adjust_zoom(-ZOOM_STEP)
+
+func _adjust_zoom(delta: float) -> void:
+	var new_zoom: float = clamp($Camera2D.zoom.x + delta, MIN_ZOOM, MAX_ZOOM)
+	$Camera2D.zoom = Vector2(new_zoom, new_zoom)
 
 func _on_boss_defeated() -> void:
 	if mission_ended:
@@ -38,5 +55,5 @@ func _on_boss_defeated() -> void:
 
 func _complete_mission() -> void:
 	mission_ended = true
-	var credits := GameState.current_mission.credit_reward + GameState.calculate_weapon_salvage()
+	var credits := GameState.current_mission.credit_reward + GameState.calculate_weapon_salvage() + GameState.run_credits
 	GameState.mission_complete.emit(credits)

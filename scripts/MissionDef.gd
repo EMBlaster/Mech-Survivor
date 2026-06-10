@@ -9,6 +9,9 @@ class_name MissionDef extends Resource
 @export var base_difficulty: int = 1         # 1-3, sets enemy stat floor multiplier
 @export var credit_reward: int = 300
 @export var bonus_wave_reward: int = 150
+## Once the scheduled waves are exhausted (or in addition to them), the spawner
+## keeps the alive enemy count topped up to this cap so combat stays dense.
+@export var max_alive_enemies: int = 8
 @export var wave_schedule: Array[Dictionary] = []
 # wave_schedule entry format:
 # { "time": 30.0, "archetype": "scout", "count": 2, "tier_mult": 1.0 }

@@ -3,6 +3,9 @@ extends ColorRect
 const GRID_SPACING: float = 100.0
 const GRID_COLOR: Color = Color(1, 1, 1, 0.08)
 
+func _ready() -> void:
+	resized.connect(queue_redraw)
+
 func _draw() -> void:
 	var x := 0.0
 	while x <= size.x:

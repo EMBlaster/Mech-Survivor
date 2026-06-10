@@ -6,6 +6,7 @@ var aoe_radius: float = 0.0
 var target: Node2D = null
 var weapon_type: String = ""
 var direction: Vector2 = Vector2.ZERO
+var traveled: float = 0.0
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -40,8 +41,9 @@ func _physics_process(delta: float) -> void:
 			position += direction * speed * delta
 		_:
 			position += direction * speed * delta
-	# Cull if out of range (2000px from origin -- adjust as needed)
-	if position.length() > 2000.0:
+	# Cull once it has traveled out of range (adjust as needed)
+	traveled += speed * delta
+	if traveled > 2000.0:
 		queue_free()
 
 func _on_body_entered(body: Node2D) -> void:

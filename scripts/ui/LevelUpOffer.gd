@@ -4,6 +4,7 @@ const WEAPON_DIR := "res://resources/weapons/"
 
 var current_offers: Array[WeaponDef] = []
 var card_buttons: Array[Button] = []
+var pending_levels: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
@@ -14,8 +15,20 @@ func _ready() -> void:
 		card_buttons[i].pressed.connect(_on_card_pressed.bind(i))
 
 func _on_level_up(_new_level: int) -> void:
+	pending_levels += 1
+	if visible:
+		return
+	_show_next_offer()
+
+func _show_next_offer() -> void:
 	_build_offers()
+	if current_offers.is_empty():
+		pending_levels = 0
+		visible = false
+		get_tree().paused = false
+		return
 	visible = true
+	get_tree().paused = true
 
 func _build_offers() -> void:
 	var all_weapons := _load_all_weapons()
@@ -25,6 +38,13 @@ func _build_offers() -> void:
 		if w.tier < 1 or w.tier > max_tier:
 			continue
 		var owned := _find_owned(w)
+		# New weapons are only offered at Tier 1; owned weapons can only be
+		# upgraded one tier at a time.
+		if owned == null:
+			if w.tier != 1:
+				continue
+		elif w.tier != owned.tier + 1:
+			continue
 		var weight: int = 3 if owned == null else 1
 		for _i in weight:
 			pool.append(w)
@@ -80,5 +100,9 @@ func _on_card_pressed(index: int) -> void:
 	if player:
 		player.rebuild_weapons()
 		player.get_parent().get_node("HUD").rebuild_weapon_icons()
-	visible = false
-	get_tree().paused = false
+	pending_levels -= 1
+	if pending_levels > 0:
+		_show_next_offer()
+	else:
+		visible = false
+		get_tree().paused = false

@@ -6,6 +6,7 @@ func _ready() -> void:
 	$TopLeft/ArmorBar.show_percentage = false
 	$TopLeft/XPBar.show_percentage = false
 	GameState.level_up.connect(_on_level_up)
+	GameState.xp_changed.connect(_on_xp_changed)
 	_update_xp_bar()
 
 func refresh(player: CharacterBody2D) -> void:
@@ -35,6 +36,9 @@ func _update_xp_bar() -> void:
 func _on_level_up(_new_level: int) -> void:
 	_update_xp_bar()
 	rebuild_weapon_icons()
+
+func _on_xp_changed(_current_xp: int, _current_level: int) -> void:
+	_update_xp_bar()
 
 func _update_timer_label() -> void:
 	var t: float = GameState.mission_timer

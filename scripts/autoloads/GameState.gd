@@ -10,11 +10,13 @@ var current_level: int = 1
 var mission_timer: float = 0.0
 var is_bonus_wave: bool = false
 var current_mission: MissionDef = null
+var run_credits: int = 0  # bounty credits earned from kills this run, banked at mission end
 
 # XP thresholds per level (expandable array)
 var xp_thresholds: Array[int] = [100, 250, 450, 700, 1000, 1400, 1900, 2500]
 
 signal level_up(new_level: int)
+signal xp_changed(current_xp: int, current_level: int)
 signal mission_complete(credits_earned: int)
 signal player_died(credits_earned: int)
 
@@ -25,13 +27,19 @@ func reset_run(mech: MechDef) -> void:
 	current_level = 1
 	mission_timer = 0.0
 	is_bonus_wave = false
+	run_credits = 0
 
 func add_xp(amount: int) -> void:
 	current_xp += amount
 	var threshold_index = current_level - 1
-	if threshold_index < xp_thresholds.size() and current_xp >= xp_thresholds[threshold_index]:
+	while threshold_index < xp_thresholds.size() and current_xp >= xp_thresholds[threshold_index]:
 		current_level += 1
+		threshold_index = current_level - 1
 		emit_signal("level_up", current_level)
+	xp_changed.emit(current_xp, current_level)
+
+func add_run_credits(amount: int) -> void:
+	run_credits += amount
 
 ## Weapons picked up or upgraded during a run don't carry over to the next
 ## mission, so convert anything above the mech's starting loadout into
@@ -53,6 +61,7 @@ func add_weapon(weapon: WeaponDef) -> void:
 	for i in active_weapons.size():
 		if active_weapons[i].weapon_name == weapon.weapon_name and \
 		   active_weapons[i].manufacturer == weapon.manufacturer:
-			active_weapons[i] = weapon  # replace with higher-tier version
+			if weapon.tier > active_weapons[i].tier:
+				active_weapons[i] = weapon  # replace with higher-tier version
 			return
 	active_weapons.append(weapon)

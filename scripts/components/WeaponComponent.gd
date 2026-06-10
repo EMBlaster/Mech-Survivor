@@ -8,6 +8,25 @@ func setup(def: WeaponDef, container: Node2D) -> void:
 	weapon_def = def
 	projectile_container = container
 	cooldown_timer = 0.0
+	queue_redraw()
+
+func _draw() -> void:
+	if weapon_def == null:
+		return
+	var color := _range_color(weapon_def.weapon_type)
+	draw_circle(Vector2.ZERO, weapon_def.range, Color(color.r, color.g, color.b, 0.05))
+	draw_arc(Vector2.ZERO, weapon_def.range, 0, TAU, 64, Color(color.r, color.g, color.b, 0.35), 1.5)
+
+func _range_color(weapon_type: String) -> Color:
+	match weapon_type:
+		"autocannon":
+			return Color(1.0, 0.7, 0.1)
+		"laser":
+			return Color(1.0, 0.15, 0.15)
+		"missile":
+			return Color(0.3, 1.0, 0.4)
+		_:
+			return Color(1, 1, 1)
 
 func _process(delta: float) -> void:
 	cooldown_timer -= delta

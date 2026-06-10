@@ -9,6 +9,7 @@ duration_seconds = 180.0
 win_condition = "defeat_boss"
 credit_reward = 250
 bonus_wave_reward = 100
+max_alive_enemies = 6
 wave_schedule = Array[Dictionary]([{
 "archetype": "scout",
 "count": 1,
