@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/EnemyDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+enemy_name = "Catapult CPLT-C1"
+archetype = "artillery"
+base_armor = 60.0
+base_speed = 40.0
+base_weapons = Array[WeaponDef]([])
+xp_value = 30
+credits_value = 0

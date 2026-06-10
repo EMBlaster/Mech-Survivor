@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://t74jw5ohepuq"]
+
+[ext_resource type="Script" uid="uid://beeksd7r2m63c" path="res://scripts/ui/MainMenu.gd" id="1_vjtqc"]
+
+[node name="MainMenu" type="Control" unique_id=1881197653]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_vjtqc")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1646154310]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=243908791]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=450373815]
+layout_mode = 2
+text = "MECH HEAVEN"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=2001201390]
+layout_mode = 2
+text = "Start"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1786842639]
+layout_mode = 2
+text = "Quit"

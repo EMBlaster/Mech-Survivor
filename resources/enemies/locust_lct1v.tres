@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/EnemyDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+enemy_name = "Locust LCT-1V"
+archetype = "scout"
+base_armor = 20.0
+base_speed = 120.0
+base_weapons = Array[WeaponDef]([])
+xp_value = 8
+credits_value = 0

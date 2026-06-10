@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MechDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/MechDef.gd" id="1_script"]
+[ext_resource type="Resource" path="res://resources/weapons/lrm15.tres" id="2_lrm15"]
+[ext_resource type="Resource" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
+
+[resource]
+script = ExtResource("1_script")
+mech_name = "Catapult CPLT-C1"
+weight_class = "Medium"
+max_speed = 65.0
+max_armor = 120.0
+heat_capacity = 30.0
+starting_weapons = Array[WeaponDef]([ExtResource("2_lrm15"), ExtResource("2_lrm15"), ExtResource("3_ml"), ExtResource("3_ml")])
+unlock_cost = 600

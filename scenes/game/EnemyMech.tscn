@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://cabftme4ttn8f"]
+
+[ext_resource type="Script" uid="uid://db6juulvgmou" path="res://scripts/components/EnemyMech.gd" id="1_5535a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5535a"]
+radius = 16.0
+
+[node name="EnemyMech" type="CharacterBody2D" unique_id=954886496]
+motion_mode = 1
+script = ExtResource("1_5535a")
+
+[node name="Sprite" type="ColorRect" parent="." unique_id=587530186]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+mouse_filter = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=103323462]
+shape = SubResource("CircleShape2D_5535a")
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=440758400]
+offset_left = -16.0
+offset_top = -28.0
+offset_right = 16.0
+offset_bottom = -1.0
+mouse_filter = 2
+show_percentage = false

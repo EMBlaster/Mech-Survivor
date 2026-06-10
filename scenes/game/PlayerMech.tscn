@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://bd75ig0fu82cd"]
+
+[ext_resource type="Script" uid="uid://dvjcnuwmtgjvh" path="res://scripts/components/PlayerMech.gd" id="1_b6cqs"]
+[ext_resource type="Script" uid="uid://c1lb16y1lwyv" path="res://scripts/components/HealthComponent.gd" id="2_kfmni"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kfmni"]
+radius = 18.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g6l8q"]
+radius = 20.0
+
+[node name="PlayerMech" type="CharacterBody2D" unique_id=475272936]
+motion_mode = 1
+script = ExtResource("1_b6cqs")
+
+[node name="Sprite" type="ColorRect" parent="." unique_id=326860299]
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
+mouse_filter = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=74306359]
+shape = SubResource("CircleShape2D_kfmni")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=499646654]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1435206232]
+shape = SubResource("CircleShape2D_g6l8q")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=995721942]
+script = ExtResource("2_kfmni")
+
+[node name="WeaponMount" type="Node2D" parent="." unique_id=1934836226]

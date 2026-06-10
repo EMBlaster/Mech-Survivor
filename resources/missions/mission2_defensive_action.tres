@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MissionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/MissionDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+mission_name = "Defensive Action"
+duration_seconds = 300.0
+base_difficulty = 2
+credit_reward = 500
+bonus_wave_reward = 200
+wave_schedule = Array[Dictionary]([{"time": 0.0, "archetype": "scout", "count": 2, "tier_mult": 1.0}, {"time": 0.0, "archetype": "brawler", "count": 1, "tier_mult": 1.0}, {"time": 30.0, "archetype": "scout", "count": 3, "tier_mult": 1.0}, {"time": 30.0, "archetype": "brawler", "count": 1, "tier_mult": 1.0}, {"time": 60.0, "archetype": "brawler", "count": 2, "tier_mult": 1.0}, {"time": 90.0, "archetype": "artillery", "count": 1, "tier_mult": 1.0}, {"time": 90.0, "archetype": "scout", "count": 3, "tier_mult": 1.0}, {"time": 150.0, "archetype": "brawler", "count": 3, "tier_mult": 1.0}, {"time": 150.0, "archetype": "artillery", "count": 1, "tier_mult": 1.0}, {"time": 210.0, "archetype": "scout", "count": 5, "tier_mult": 1.2}, {"time": 210.0, "archetype": "brawler", "count": 2, "tier_mult": 1.2}, {"time": 270.0, "archetype": "boss", "count": 1, "tier_mult": 1.0}])

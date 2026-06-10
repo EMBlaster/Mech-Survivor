@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b43gjt8xl4pnd"]
+
+[ext_resource type="Script" uid="uid://d3w3hhgg8h1mr" path="res://scripts/fx/ExplosionFX.gd" id="1_wbmg5"]
+
+[node name="ExplosionFX" type="Node2D" unique_id=1431845549]
+script = ExtResource("1_wbmg5")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=669617142]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(1, 0.8, 0.2, 1)

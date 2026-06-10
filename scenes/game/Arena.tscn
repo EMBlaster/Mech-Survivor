@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://c7ta3ff265mpr"]
+
+[ext_resource type="Script" uid="uid://4nm3p3xwl7ry" path="res://scripts/components/Arena.gd" id="1_fukgj"]
+[ext_resource type="Script" uid="uid://cm10vmkkldkcr" path="res://scripts/components/Ground.gd" id="2_7n2tc"]
+[ext_resource type="Script" uid="uid://dw6olnty8csd1" path="res://scripts/components/EnemySpawner.gd" id="2_tol4y"]
+[ext_resource type="Script" uid="uid://dgctiyuvcn8ig" path="res://scripts/ui/HUD.gd" id="3_hff8k"]
+[ext_resource type="PackedScene" uid="uid://b2qwq5mrvywnk" path="res://scenes/ui/LevelUpOffer.tscn" id="3_xyjp5"]
+[ext_resource type="Script" uid="uid://c6hyuw3e8eun4" path="res://scripts/ui/LevelUpOffer.gd" id="4_hff8k"]
+[ext_resource type="PackedScene" uid="uid://ca86hittdg5ge" path="res://scenes/ui/MissionResult.tscn" id="6_oc6ea"]
+[ext_resource type="Script" uid="uid://ba0o7ihow8arn" path="res://scripts/ui/MissionResult.gd" id="7_7n2tc"]
+
+[node name="Arena" type="Node2D" unique_id=1870294851]
+script = ExtResource("1_fukgj")
+
+[node name="Ground" type="ColorRect" parent="." unique_id=776358757]
+offset_left = -1500.0
+offset_top = -1500.0
+offset_right = 1500.0
+offset_bottom = 1500.0
+mouse_filter = 2
+color = Color(0.18, 0.2, 0.16, 1)
+script = ExtResource("2_7n2tc")
+
+[node name="PlayerSpawn" type="Marker2D" parent="." unique_id=1685713377]
+
+[node name="EnemySpawner" type="Node2D" parent="." unique_id=1247464508]
+script = ExtResource("2_tol4y")
+
+[node name="ProjectileContainer" type="Node2D" parent="." unique_id=144620113]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1562261535]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1016337739]
+script = ExtResource("3_hff8k")
+
+[node name="TopLeft" type="VBoxContainer" parent="HUD" unique_id=626104766]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 4.0
+offset_bottom = 58.0
+
+[node name="ArmorBar" type="ProgressBar" parent="HUD/TopLeft" unique_id=1094372899]
+modulate = Color(1, 0.25, 0.25, 1)
+custom_minimum_size = Vector2(220, 18)
+layout_mode = 2
+
+[node name="XPBar" type="ProgressBar" parent="HUD/TopLeft" unique_id=2136293042]
+modulate = Color(0.3, 1, 0.4, 1)
+custom_minimum_size = Vector2(220, 18)
+layout_mode = 2
+
+[node name="TopRight" type="Label" parent="HUD" unique_id=100163412]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 46.0
+text = "00:00"
+horizontal_alignment = 2
+
+[node name="WeaponRow" type="HBoxContainer" parent="HUD" unique_id=206163569]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -64.0
+offset_right = 150.0
+offset_bottom = -16.0
+
+[node name="LevelUpOffer" type="CanvasLayer" parent="." unique_id=1895383660 instance=ExtResource("3_xyjp5")]
+script = ExtResource("4_hff8k")
+
+[node name="MissionResult" type="CanvasLayer" parent="." unique_id=49971691 instance=ExtResource("6_oc6ea")]
+script = ExtResource("7_7n2tc")

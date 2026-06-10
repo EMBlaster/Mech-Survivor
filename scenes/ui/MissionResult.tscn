@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://ca86hittdg5ge"]
+
+[ext_resource type="Script" uid="uid://ba0o7ihow8arn" path="res://scripts/ui/MissionResult.gd" id="1_fn0io"]
+
+[node name="MissionResult" type="CanvasLayer" unique_id=49971691]
+script = ExtResource("1_fn0io")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=262713000]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="Panel" parent="CenterContainer" unique_id=1338064762]
+custom_minimum_size = Vector2(320, 220)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/Panel" unique_id=854339092]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBoxContainer" unique_id=1919259145]
+layout_mode = 2
+text = "MISSION COMPLETE"
+horizontal_alignment = 1
+
+[node name="CreditsLabel" type="Label" parent="CenterContainer/Panel/VBoxContainer" unique_id=814782698]
+layout_mode = 2
+text = "Credits Earned: 0"
+horizontal_alignment = 1
+
+[node name="RetryButton" type="Button" parent="CenterContainer/Panel/VBoxContainer" unique_id=537868549]
+layout_mode = 2
+text = "Retry Mission"
+
+[node name="MenuButton" type="Button" parent="CenterContainer/Panel/VBoxContainer" unique_id=722828374]
+layout_mode = 2
+text = "Main Menu"

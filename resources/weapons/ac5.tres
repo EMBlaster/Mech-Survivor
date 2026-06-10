@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/WeaponDef.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/game/Projectile.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_name = "AC/5"
+weapon_type = "autocannon"
+manufacturer = "Standard"
+tier = 1
+damage = 8.0
+range = 400.0
+cooldown = 1.2
+projectile_speed = 600.0
+aoe_radius = 0.0
+projectile_scene = ExtResource("2_proj")

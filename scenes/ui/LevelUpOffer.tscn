@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://b2qwq5mrvywnk"]
+
+[ext_resource type="Script" uid="uid://c6hyuw3e8eun4" path="res://scripts/ui/LevelUpOffer.gd" id="1_wjn00"]
+
+[node name="LevelUpOffer" type="CanvasLayer" unique_id=1895383660]
+script = ExtResource("1_wjn00")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=807517521]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer" unique_id=1092791853]
+layout_mode = 2
+
+[node name="Card1" type="Button" parent="CenterContainer/HBoxContainer" unique_id=1602861580]
+custom_minimum_size = Vector2(220, 160)
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Card2" type="Button" parent="CenterContainer/HBoxContainer" unique_id=460185690]
+custom_minimum_size = Vector2(220, 160)
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Card3" type="Button" parent="CenterContainer/HBoxContainer" unique_id=1524139746]
+custom_minimum_size = Vector2(220, 160)
+layout_mode = 2
+autowrap_mode = 3

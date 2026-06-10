@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MechDef" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/MechDef.gd" id="1_script"]
+[ext_resource type="Resource" path="res://resources/weapons/ac20.tres" id="2_ac20"]
+[ext_resource type="Resource" path="res://resources/weapons/lrm15.tres" id="3_lrm15"]
+[ext_resource type="Resource" path="res://resources/weapons/srm4.tres" id="4_srm4"]
+[ext_resource type="Resource" path="res://resources/weapons/medium_laser.tres" id="5_ml"]
+
+[resource]
+script = ExtResource("1_script")
+mech_name = "Atlas AS7-D"
+weight_class = "Assault"
+max_speed = 35.0
+max_armor = 320.0
+heat_capacity = 30.0
+starting_weapons = Array[WeaponDef]([ExtResource("2_ac20"), ExtResource("3_lrm15"), ExtResource("4_srm4"), ExtResource("5_ml"), ExtResource("5_ml"), ExtResource("5_ml"), ExtResource("5_ml")])
+unlock_cost = 1800

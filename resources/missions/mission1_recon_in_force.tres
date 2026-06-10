@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="MissionDef" format=3 uid="uid://3cw0mnihuyae"]
+
+[ext_resource type="Script" uid="uid://dc13gxyos78ua" path="res://scripts/MissionDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+mission_name = "Recon in Force"
+duration_seconds = 180.0
+win_condition = "defeat_boss"
+credit_reward = 250
+bonus_wave_reward = 100
+wave_schedule = Array[Dictionary]([{
+"archetype": "scout",
+"count": 1,
+"tier_mult": 1.0,
+"time": 0.0
+}, {
+"archetype": "scout",
+"count": 2,
+"tier_mult": 1.0,
+"time": 30.0
+}, {
+"archetype": "scout",
+"count": 3,
+"tier_mult": 1.0,
+"time": 60.0
+}, {
+"archetype": "scout",
+"count": 4,
+"tier_mult": 1.0,
+"time": 90.0
+}, {
+"archetype": "brawler",
+"count": 1,
+"tier_mult": 1.0,
+"time": 90.0
+}, {
+"archetype": "boss",
+"count": 1,
+"tier_mult": 1.0,
+"time": 120.0
+}])

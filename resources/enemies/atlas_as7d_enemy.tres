@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/EnemyDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+enemy_name = "Atlas AS7-D"
+archetype = "boss"
+base_armor = 300.0
+base_speed = 25.0
+base_weapons = Array[WeaponDef]([])
+xp_value = 150
+credits_value = 50

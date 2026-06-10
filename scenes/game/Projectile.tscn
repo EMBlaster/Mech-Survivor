@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cbr4gstkkvol0"]
+
+[ext_resource type="Script" uid="uid://bye5xohp3rln7" path="res://scripts/components/Projectile.gd" id="1_cjima"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cjima"]
+radius = 5.0
+
+[node name="Projectile" type="Area2D" unique_id=1047787386]
+script = ExtResource("1_cjima")
+
+[node name="Sprite" type="ColorRect" parent="." unique_id=197916710]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+mouse_filter = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=391168509]
+shape = SubResource("CircleShape2D_cjima")
