@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://dq7vxk2m4rwth"]
+
+[ext_resource type="Script" uid="uid://c3pq8m1k5vwxz" path="res://scripts/ui/MechLab.gd" id="1_mechlab"]
+
+[node name="MechLab" type="Control" unique_id=70010001]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_mechlab")
+
+[node name="MainVBox" type="VBoxContainer" parent="." unique_id=70010002]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+
+[node name="ContentHBox" type="HBoxContainer" parent="MainVBox" unique_id=70010003]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainVBox/ContentHBox" unique_id=70010004]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 35.0
+
+[node name="RightPanel" type="VBoxContainer" parent="MainVBox/ContentHBox" unique_id=70010005]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 65.0
+
+[node name="BottomBar" type="HBoxContainer" parent="MainVBox" unique_id=70010006]
+layout_mode = 2

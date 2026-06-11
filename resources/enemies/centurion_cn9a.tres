@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyDef" format=3 uid="uid://686kqymnvlu6"]
 
-[ext_resource type="Script" path="res://scripts/EnemyDef.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://csjrchfei6nus" path="res://scripts/WeaponDef.gd" id="1_gowth"]
+[ext_resource type="Script" uid="uid://cg5bgavxtj3r" path="res://scripts/EnemyDef.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -8,6 +9,5 @@ enemy_name = "Centurion CN9-A"
 archetype = "brawler"
 base_armor = 80.0
 base_speed = 55.0
-base_weapons = Array[WeaponDef]([])
 xp_value = 25
 credits_value = 5

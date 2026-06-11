@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EquipmentDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/EquipmentDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+equipment_name = "Heat Sink"
+weight = 1.0
+slot_cost = 1
+effect_type = "heat_sink"
+effect_value = 0.85
+tier = 2

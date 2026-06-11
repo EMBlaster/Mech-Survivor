@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="MechDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="MechDef" format=3 uid="uid://de5vnu76ngha7"]
 
-[ext_resource type="Script" path="res://scripts/MechDef.gd" id="1_script"]
-[ext_resource type="Resource" path="res://resources/weapons/ppc.tres" id="2_ppc"]
-[ext_resource type="Resource" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
-[ext_resource type="Resource" path="res://resources/weapons/srm4.tres" id="4_srm4"]
+[ext_resource type="Script" uid="uid://dpltx2pwc7mgk" path="res://scripts/MechDef.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://csjrchfei6nus" path="res://scripts/WeaponDef.gd" id="2_1r6aa"]
+[ext_resource type="Resource" uid="uid://bldf1a8aqe3sh" path="res://resources/weapons/ppc.tres" id="2_ppc"]
+[ext_resource type="Resource" uid="uid://6iogov6q308x" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
+[ext_resource type="Resource" uid="uid://dup6a2sbw2qvl" path="res://resources/weapons/srm4.tres" id="4_srm4"]
 
 [resource]
 script = ExtResource("1_script")
@@ -11,6 +12,7 @@ mech_name = "Warhammer WHM-6R"
 weight_class = "Heavy"
 max_speed = 55.0
 max_armor = 180.0
-heat_capacity = 30.0
-starting_weapons = Array[WeaponDef]([ExtResource("2_ppc"), ExtResource("2_ppc"), ExtResource("3_ml"), ExtResource("3_ml"), ExtResource("4_srm4")])
+structure = 100.0
+starting_weapons = Array[ExtResource("2_1r6aa")]([ExtResource("2_ppc"), ExtResource("2_ppc"), ExtResource("3_ml"), ExtResource("3_ml"), ExtResource("4_srm4")])
 unlock_cost = 900
+free_tonnage = 27.0

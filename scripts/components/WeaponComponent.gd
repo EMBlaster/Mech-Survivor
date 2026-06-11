@@ -1,19 +1,26 @@
 class_name WeaponComponent extends Node2D
 
+const OUT_OF_AMMO_ALPHA: float = 0.15
+
 var weapon_def: WeaponDef = null
 var cooldown_timer: float = 0.0
 var projectile_container: Node2D  # set by PlayerMech on instantiation
+var out_of_ammo: bool = false
 
 func setup(def: WeaponDef, container: Node2D) -> void:
 	weapon_def = def
 	projectile_container = container
 	cooldown_timer = 0.0
+	out_of_ammo = false
+	modulate = Color(1, 1, 1, 1)
 	queue_redraw()
 
 func _draw() -> void:
 	if weapon_def == null:
 		return
 	var color := _range_color(weapon_def.weapon_type)
+	if out_of_ammo:
+		return
 	draw_circle(Vector2.ZERO, weapon_def.range, Color(color.r, color.g, color.b, 0.05))
 	draw_arc(Vector2.ZERO, weapon_def.range, 0, TAU, 64, Color(color.r, color.g, color.b, 0.35), 1.5)
 
@@ -29,9 +36,20 @@ func _range_color(weapon_type: String) -> Color:
 			return Color(1, 1, 1)
 
 func _process(delta: float) -> void:
+	_update_ammo_state()
 	cooldown_timer -= delta
 	if cooldown_timer <= 0.0:
 		_try_fire()
+
+## Dims the weapon (and hides its range circle) while it has no ammo left,
+## restoring full visibility once reloaded (e.g. via a salvage ammo bin).
+func _update_ammo_state() -> void:
+	var ooa := weapon_def.ammo_type != "" and not GameState.has_ammo(weapon_def)
+	if ooa == out_of_ammo:
+		return
+	out_of_ammo = ooa
+	modulate = Color(1, 1, 1, OUT_OF_AMMO_ALPHA) if out_of_ammo else Color(1, 1, 1, 1)
+	queue_redraw()
 
 func _try_fire() -> void:
 	var target := _find_nearest_enemy()
@@ -40,8 +58,11 @@ func _try_fire() -> void:
 	var dist := global_position.distance_to(target.global_position)
 	if dist > weapon_def.range:
 		return
+	if not GameState.has_ammo(weapon_def):
+		return
 	_spawn_projectile(target)
-	cooldown_timer = weapon_def.cooldown
+	GameState.consume_ammo(weapon_def)
+	cooldown_timer = weapon_def.get_cooldown()
 
 func _find_nearest_enemy() -> Node2D:
 	var enemies := get_tree().get_nodes_in_group("enemies")

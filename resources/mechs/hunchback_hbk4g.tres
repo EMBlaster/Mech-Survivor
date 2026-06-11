@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="MechDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="MechDef" format=3 uid="uid://b3u3nqnowx1y0"]
 
-[ext_resource type="Script" path="res://scripts/MechDef.gd" id="1_script"]
-[ext_resource type="Resource" path="res://resources/weapons/ac20.tres" id="2_ac20"]
-[ext_resource type="Resource" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
+[ext_resource type="Script" uid="uid://dpltx2pwc7mgk" path="res://scripts/MechDef.gd" id="1_script"]
+[ext_resource type="Resource" uid="uid://dkk3u4i74kson" path="res://resources/weapons/ac20.tres" id="2_ac20"]
+[ext_resource type="Script" uid="uid://csjrchfei6nus" path="res://scripts/WeaponDef.gd" id="2_xti8c"]
+[ext_resource type="Resource" uid="uid://6iogov6q308x" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,6 +11,7 @@ mech_name = "Hunchback HBK-4G"
 weight_class = "Medium"
 max_speed = 60.0
 max_armor = 160.0
-heat_capacity = 30.0
-starting_weapons = Array[WeaponDef]([ExtResource("2_ac20"), ExtResource("3_ml"), ExtResource("3_ml")])
+structure = 80.0
+starting_weapons = Array[ExtResource("2_xti8c")]([ExtResource("2_ac20"), ExtResource("3_ml"), ExtResource("3_ml")])
 unlock_cost = 400
+free_tonnage = 18.0

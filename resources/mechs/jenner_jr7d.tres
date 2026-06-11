@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="MechDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="MechDef" format=3 uid="uid://g6wbm81y2m0x"]
 
-[ext_resource type="Script" path="res://scripts/MechDef.gd" id="1_script"]
-[ext_resource type="Resource" path="res://resources/weapons/srm4.tres" id="2_srm4"]
-[ext_resource type="Resource" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
+[ext_resource type="Script" uid="uid://dpltx2pwc7mgk" path="res://scripts/MechDef.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://csjrchfei6nus" path="res://scripts/WeaponDef.gd" id="2_goilw"]
+[ext_resource type="Resource" uid="uid://dup6a2sbw2qvl" path="res://resources/weapons/srm4.tres" id="2_srm4"]
+[ext_resource type="Resource" uid="uid://6iogov6q308x" path="res://resources/weapons/medium_laser.tres" id="3_ml"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,6 +11,5 @@ mech_name = "Jenner JR7-D"
 weight_class = "Light"
 max_speed = 110.0
 max_armor = 60.0
-heat_capacity = 30.0
-starting_weapons = Array[WeaponDef]([ExtResource("2_srm4"), ExtResource("2_srm4"), ExtResource("3_ml"), ExtResource("3_ml")])
-unlock_cost = 0
+structure = 28.0
+starting_weapons = Array[ExtResource("2_goilw")]([ExtResource("2_srm4"), ExtResource("2_srm4"), ExtResource("3_ml"), ExtResource("3_ml")])

@@ -9,6 +9,14 @@ const SCALING_FACTOR: float = 1.15
 const FILLER_CHECK_INTERVAL: float = 1.0
 const FILLER_ARCHETYPES: Array[String] = ["scout", "brawler", "artillery"]
 
+## Post-boss escalation (Assassination "farm or extract" phase): periodic
+## bonus waves on top of the normal fill-to-cap, arriving faster over time
+## down to a floor of POST_BOSS_MIN_INTERVAL.
+const POST_BOSS_INITIAL_INTERVAL: float = 20.0
+const POST_BOSS_MIN_INTERVAL: float = 10.0
+const POST_BOSS_INTERVAL_DECAY: float = 0.85
+const POST_BOSS_WAVE_SIZE: int = 2
+
 const ARCHETYPE_DEFS := {
 	"scout": preload("res://resources/enemies/locust_lct1v.tres"),
 	"brawler": preload("res://resources/enemies/centurion_cn9a.tres"),
@@ -21,6 +29,9 @@ var elapsed_time: float = 0.0
 var pending_waves: Array[Dictionary] = []
 var filler_check_timer: float = 0.0
 var active_bosses: int = 0
+var post_boss_active: bool = false
+var post_boss_interval: float = POST_BOSS_INITIAL_INTERVAL
+var post_boss_timer: float = 0.0
 
 func setup(mission_def: MissionDef) -> void:
 	mission = mission_def
@@ -28,6 +39,17 @@ func setup(mission_def: MissionDef) -> void:
 	pending_waves = mission.wave_schedule.duplicate()
 	filler_check_timer = 0.0
 	active_bosses = 0
+	post_boss_active = false
+	post_boss_interval = POST_BOSS_INITIAL_INTERVAL
+	post_boss_timer = 0.0
+
+## Called once the boss is defeated in an Assassination mission. Begins
+## periodic escalating bonus waves (in addition to normal fill-to-cap) for
+## as long as the player chooses to keep farming before extracting.
+func start_escalating_spawns() -> void:
+	post_boss_active = true
+	post_boss_interval = POST_BOSS_INITIAL_INTERVAL
+	post_boss_timer = post_boss_interval
 
 func _process(delta: float) -> void:
 	if mission == null:
@@ -53,6 +75,21 @@ func _process(delta: float) -> void:
 	if filler_check_timer >= FILLER_CHECK_INTERVAL:
 		filler_check_timer -= FILLER_CHECK_INTERVAL
 		_fill_to_cap()
+
+	if post_boss_active:
+		post_boss_timer -= delta
+		if post_boss_timer <= 0.0:
+			_spawn_post_boss_wave()
+			post_boss_interval = max(POST_BOSS_MIN_INTERVAL, post_boss_interval * POST_BOSS_INTERVAL_DECAY)
+			post_boss_timer = post_boss_interval
+
+func _spawn_post_boss_wave() -> void:
+	var scaling_steps: float = floor(elapsed_time / SCALING_INTERVAL)
+	var diff_mult: float = mission.base_difficulty * pow(SCALING_FACTOR, scaling_steps)
+	for i in POST_BOSS_WAVE_SIZE:
+		var archetype: String = FILLER_ARCHETYPES[randi() % FILLER_ARCHETYPES.size()]
+		var def: EnemyDef = ARCHETYPE_DEFS.get(archetype)
+		_spawn_enemy(def, diff_mult)
 
 func _fill_to_cap() -> void:
 	var alive := get_tree().get_nodes_in_group("enemies").size()

@@ -1,9 +1,6 @@
 [gd_scene format=3 uid="uid://b2qwq5mrvywnk"]
 
-[ext_resource type="Script" uid="uid://c6hyuw3e8eun4" path="res://scripts/ui/LevelUpOffer.gd" id="1_wjn00"]
-
 [node name="LevelUpOffer" type="CanvasLayer" unique_id=1895383660]
-script = ExtResource("1_wjn00")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=807517521]
 anchors_preset = 15

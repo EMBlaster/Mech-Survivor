@@ -7,6 +7,7 @@ script = ExtResource("1_script")
 mission_name = "Recon in Force"
 duration_seconds = 180.0
 win_condition = "defeat_boss"
+boss_spawn_time = 120.0
 credit_reward = 250
 bonus_wave_reward = 100
 max_alive_enemies = 6

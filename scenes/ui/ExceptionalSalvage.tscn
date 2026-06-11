@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dxs1pj2c4hs7v"]
+
+[ext_resource type="Script" uid="uid://b0fq8j2g3mxqy" path="res://scripts/ui/ExceptionalSalvage.gd" id="1_fn0io"]
+
+[node name="ExceptionalSalvage" type="CanvasLayer" unique_id=49981691]
+script = ExtResource("1_fn0io")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=262714000]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="Panel" parent="CenterContainer" unique_id=1338065762]
+custom_minimum_size = Vector2(360, 220)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/Panel" unique_id=854340092]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/VBoxContainer" unique_id=1919260145]
+layout_mode = 2
+text = "EXCEPTIONAL SALVAGE"
+horizontal_alignment = 1
+
+[node name="ContentLabel" type="Label" parent="CenterContainer/Panel/VBoxContainer" unique_id=814783698]
+layout_mode = 2
+text = "The boss wreck yields valuable salvage."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DismissButton" type="Button" parent="CenterContainer/Panel/VBoxContainer" unique_id=537869549]
+layout_mode = 2
+text = "Continue"

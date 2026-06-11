@@ -23,6 +23,7 @@ func _ready() -> void:
 	$EnemySpawner.setup(GameState.current_mission)
 	$EnemySpawner.boss_defeated.connect(_on_boss_defeated)
 	$HUD.refresh(player)
+	$HUD.extract_requested.connect(_on_extract_requested)
 
 func _process(delta: float) -> void:
 	if mission_ended:
@@ -47,10 +48,27 @@ func _adjust_zoom(delta: float) -> void:
 	var new_zoom: float = clamp($Camera2D.zoom.x + delta, MIN_ZOOM, MAX_ZOOM)
 	$Camera2D.zoom = Vector2(new_zoom, new_zoom)
 
+## Boss death never ends the mission directly. Assassination: show the
+## Exceptional Salvage panel and kick off escalating post-boss spawns so the
+## player can farm before extracting. Survival: show the panel and keep
+## surviving toward the timer.
 func _on_boss_defeated() -> void:
 	if mission_ended:
 		return
+	$ExceptionalSalvage.show_panel(SalvageSystem.roll_exceptional_salvage())
 	if GameState.current_mission.win_condition == "defeat_boss":
+		$EnemySpawner.start_escalating_spawns()
+
+## Extract button: Assassination banks rewards immediately (the intended way
+## to end the mission). Survival forfeits all rewards if used before the
+## timer expires.
+func _on_extract_requested() -> void:
+	if mission_ended:
+		return
+	if GameState.current_mission.win_condition == "survive":
+		mission_ended = true
+		GameState.mission_extract_failed.emit()
+	else:
 		_complete_mission()
 
 func _complete_mission() -> void:

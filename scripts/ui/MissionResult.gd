@@ -6,6 +6,7 @@ func _ready() -> void:
 	$CenterContainer/Panel/VBoxContainer.add_theme_constant_override("separation", 12)
 	GameState.mission_complete.connect(_on_mission_complete)
 	GameState.player_died.connect(_on_player_died)
+	GameState.mission_extract_failed.connect(_on_mission_extract_failed)
 	$CenterContainer/Panel/VBoxContainer/RetryButton.pressed.connect(_on_retry_pressed)
 	$CenterContainer/Panel/VBoxContainer/MenuButton.pressed.connect(_on_menu_pressed)
 
@@ -14,6 +15,9 @@ func _on_mission_complete(credits_earned: int) -> void:
 
 func _on_player_died(credits_earned: int) -> void:
 	_show_result("MECH DESTROYED", credits_earned)
+
+func _on_mission_extract_failed() -> void:
+	_show_result("EXTRACTED EARLY - NO REWARD", 0)
 
 func _show_result(title: String, credits_earned: int) -> void:
 	$CenterContainer/Panel/VBoxContainer/TitleLabel.text = title

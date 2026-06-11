@@ -5,6 +5,18 @@ const SAVE_PATH = "user://save.cfg"
 var credits: int = 0
 var unlocked_mechs: Array[String] = ["Jenner JR7-D"]  # mech_name strings
 
+## Inventory: item key -> quantity owned.
+var owned_weapons: Dictionary = {}      # key: weapon_key(WeaponDef)
+var owned_equipment: Dictionary = {}    # key: equipment_key(EquipmentDef)
+var owned_ammo_bins: Dictionary = {}    # key: ammo_type + "_bin"
+
+## mech_name -> { "mech_id": mech_name, "items": [item_key, ...] (size SLOT_COUNT), "armor": float }
+var mech_loadouts: Dictionary = {}
+
+## The loadout currently applied to GameState.current_mech at reset_run().
+## Same shape as a mech_loadouts entry.
+var active_loadout: Dictionary = {}
+
 func _ready() -> void:
 	load_save()
 
@@ -12,6 +24,11 @@ func save() -> void:
 	var config = ConfigFile.new()
 	config.set_value("pilot", "credits", credits)
 	config.set_value("pilot", "unlocked_mechs", unlocked_mechs)
+	config.set_value("inventory", "owned_weapons", owned_weapons)
+	config.set_value("inventory", "owned_equipment", owned_equipment)
+	config.set_value("inventory", "owned_ammo_bins", owned_ammo_bins)
+	config.set_value("loadouts", "mech_loadouts", mech_loadouts)
+	config.set_value("loadouts", "active_loadout", active_loadout)
 	config.save(SAVE_PATH)
 
 func load_save() -> void:
@@ -21,6 +38,25 @@ func load_save() -> void:
 		return
 	credits = config.get_value("pilot", "credits", 0)
 	unlocked_mechs.assign(config.get_value("pilot", "unlocked_mechs", ["Jenner JR7-D"]))
+	owned_weapons = config.get_value("inventory", "owned_weapons", {})
+	owned_equipment = config.get_value("inventory", "owned_equipment", {})
+	owned_ammo_bins = config.get_value("inventory", "owned_ammo_bins", {})
+	mech_loadouts = config.get_value("loadouts", "mech_loadouts", {})
+	active_loadout = config.get_value("loadouts", "active_loadout", {})
+	_discard_old_format_loadouts()
+
+## Old saves stored loadouts as { "locations": {...}, "armor": {...} } (per
+## location). The new format is { "items": [...], "armor": float }. Discard
+## any entries still in the old shape so callers fall back to defaults.
+func _discard_old_format_loadouts() -> void:
+	for mech_name in mech_loadouts.keys().duplicate():
+		var loadout: Dictionary = mech_loadouts[mech_name]
+		var armor = loadout.get("armor")
+		if not (loadout.has("items") and (armor is float or armor is int)):
+			mech_loadouts.erase(mech_name)
+	var active_armor = active_loadout.get("armor")
+	if not (active_loadout.has("items") and (active_armor is float or active_armor is int)):
+		active_loadout = {}
 
 func add_credits(amount: int) -> void:
 	credits += amount
@@ -40,3 +76,59 @@ func unlock_mech(mech_name: String) -> void:
 
 func is_unlocked(mech_name: String) -> bool:
 	return mech_name in unlocked_mechs
+
+## --- Inventory item key helpers ---
+## These keys are used as Dictionary keys in owned_* and as entries in
+## mech_loadouts[...].items[...] arrays.
+
+func weapon_key(w: WeaponDef) -> String:
+	return "%s|%s|T%d" % [w.weapon_name, w.manufacturer, w.tier]
+
+func equipment_key(e: EquipmentDef) -> String:
+	return "%s|T%d" % [e.equipment_name, e.tier]
+
+func ammo_bin_key(bin: AmmoBin) -> String:
+	return ammo_bin_key_for_type(bin.ammo_type)
+
+func ammo_bin_key_for_type(ammo_type: String) -> String:
+	return ammo_type + "_bin"
+
+## --- Inventory mutation ---
+
+func add_owned_weapon(w: WeaponDef, quantity: int = 1) -> void:
+	var key := weapon_key(w)
+	owned_weapons[key] = owned_weapons.get(key, 0) + quantity
+	save()
+
+func add_owned_equipment(e: EquipmentDef, quantity: int = 1) -> void:
+	var key := equipment_key(e)
+	owned_equipment[key] = owned_equipment.get(key, 0) + quantity
+	save()
+
+func add_owned_ammo_bin(bin: AmmoBin, quantity: int = 1) -> void:
+	var key := ammo_bin_key(bin)
+	owned_ammo_bins[key] = owned_ammo_bins.get(key, 0) + quantity
+	save()
+
+## --- Loadouts ---
+
+## Returns the saved loadout for a mech, or its default loadout (starting
+## weapons + ammo) if none has been saved yet.
+func get_loadout(mech: MechDef) -> Dictionary:
+	if mech_loadouts.has(mech.mech_name):
+		return mech_loadouts[mech.mech_name]
+	return GameState.build_default_loadout(mech)
+
+func build_empty_loadout(mech: MechDef) -> Dictionary:
+	var items: Array = []
+	items.resize(MechDef.SLOT_COUNT)
+	items.fill("")
+	return {"mech_id": mech.mech_name, "items": items, "armor": mech.get_default_armor()}
+
+func save_loadout(mech: MechDef, loadout: Dictionary) -> void:
+	mech_loadouts[mech.mech_name] = loadout
+	save()
+
+func set_active_loadout(loadout: Dictionary) -> void:
+	active_loadout = loadout
+	save()

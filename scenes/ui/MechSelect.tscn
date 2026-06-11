@@ -27,6 +27,10 @@ layout_mode = 2
 layout_mode = 2
 text = "Launch Mission"
 
+[node name="MechLabButton" type="Button" parent="VBoxContainer" unique_id=1773310251]
+layout_mode = 2
+text = "Mech Lab"
+
 [node name="BackButton" type="Button" parent="VBoxContainer" unique_id=884942601]
 layout_mode = 2
 text = "Back"

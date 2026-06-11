@@ -2,7 +2,15 @@ extends CharacterBody2D
 
 const EXPLOSION_SCENE: PackedScene = preload("res://scenes/fx/ExplosionFX.tscn")
 const REPAIR_PACK_SCENE: PackedScene = preload("res://scenes/game/RepairPack.tscn")
-const REPAIR_PACK_DROP_CHANCE: float = 0.25
+const BALLISTIC_AMMO_CRATE_SCENE: PackedScene = preload("res://scenes/game/BallisticAmmoCrate.tscn")
+const MISSILE_AMMO_CRATE_SCENE: PackedScene = preload("res://scenes/game/MissileAmmoCrate.tscn")
+
+## Used when GameState.current_mission has no drop_weights override.
+const DEFAULT_DROP_WEIGHTS: Dictionary = {
+	"repair": 0.25,
+	"ballistic_ammo": 0.08,
+	"missile_ammo": 0.08,
+}
 
 signal defeated(enemy_def: EnemyDef)
 
@@ -60,9 +68,33 @@ func _die() -> void:
 	var fx := EXPLOSION_SCENE.instantiate()
 	get_parent().add_child(fx)
 	fx.global_position = global_position
-	if randf() < REPAIR_PACK_DROP_CHANCE:
-		var pack := REPAIR_PACK_SCENE.instantiate()
-		pack.global_position = global_position
-		get_parent().call_deferred("add_child", pack)
+	_try_spawn_drop()
 	defeated.emit(enemy_def)
 	queue_free()
+
+func _try_spawn_drop() -> void:
+	var weights := DEFAULT_DROP_WEIGHTS
+	if GameState.current_mission != null and not GameState.current_mission.drop_weights.is_empty():
+		weights = GameState.current_mission.drop_weights
+	var roll := randf()
+	var cumulative := 0.0
+	for drop_type in weights:
+		cumulative += weights[drop_type]
+		if roll < cumulative:
+			_spawn_drop(drop_type)
+			return
+
+func _spawn_drop(drop_type: String) -> void:
+	var scene: PackedScene
+	match drop_type:
+		"repair":
+			scene = REPAIR_PACK_SCENE
+		"ballistic_ammo":
+			scene = BALLISTIC_AMMO_CRATE_SCENE
+		"missile_ammo":
+			scene = MISSILE_AMMO_CRATE_SCENE
+		_:
+			return
+	var drop := scene.instantiate()
+	drop.global_position = global_position
+	get_parent().call_deferred("add_child", drop)

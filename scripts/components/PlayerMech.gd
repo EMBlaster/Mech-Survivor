@@ -2,16 +2,29 @@ extends CharacterBody2D
 
 const CONTACT_DAMAGE_PER_SECOND: float = 8.0
 
+## Dash (Jump Jets equipment, spec 8.3): a short speed burst on a cooldown.
+## Gated by GameState.has_jump_jets. Input: Space (dedicated key, OQ-1).
+const DASH_SPEED_MULTIPLIER: float = 3.0
+const DASH_DURATION: float = 0.3
+const DASH_COOLDOWN: float = 4.0
+
 var speed: float = 80.0
 var weapon_components: Array[WeaponComponent] = []
 var contacted_enemies: Array[Node2D] = []
+
+var is_dashing: bool = false
+var dash_timer: float = 0.0
+var dash_cooldown_timer: float = 0.0
+var dash_direction: Vector2 = Vector2.ZERO
+var last_direction: Vector2 = Vector2.RIGHT
+var _dash_key_was_pressed: bool = false
 
 func _ready() -> void:
 	add_to_group("player")
 	var mech_def: MechDef = GameState.current_mech
 	speed = mech_def.max_speed
 	$Sprite.color = _color_for_weight_class(mech_def.weight_class)
-	$HealthComponent.setup(mech_def.max_armor)
+	$HealthComponent.setup(mech_def.structure + GameState.current_armor)
 	$HealthComponent.died.connect(_on_died)
 	$Hitbox.body_entered.connect(_on_hitbox_body_entered)
 	$Hitbox.body_exited.connect(_on_hitbox_body_exited)
@@ -52,11 +65,37 @@ func _physics_process(delta: float) -> void:
 	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
 		direction.x += 1
 
-	velocity = direction.normalized() * speed
+	if direction != Vector2.ZERO:
+		last_direction = direction.normalized()
+
+	if dash_cooldown_timer > 0.0:
+		dash_cooldown_timer -= delta
+
+	var dash_key_pressed := Input.is_physical_key_pressed(KEY_SPACE)
+	if dash_key_pressed and not _dash_key_was_pressed and not is_dashing:
+		_try_start_dash()
+	_dash_key_was_pressed = dash_key_pressed
+
+	if is_dashing:
+		dash_timer -= delta
+		velocity = dash_direction * speed * DASH_SPEED_MULTIPLIER
+		if dash_timer <= 0.0:
+			is_dashing = false
+	else:
+		velocity = direction.normalized() * speed
+
 	move_and_slide()
 
 	if contacted_enemies.size() > 0:
 		$HealthComponent.take_damage(CONTACT_DAMAGE_PER_SECOND * contacted_enemies.size() * delta)
+
+func _try_start_dash() -> void:
+	if not GameState.has_jump_jets or dash_cooldown_timer > 0.0:
+		return
+	is_dashing = true
+	dash_timer = DASH_DURATION
+	dash_cooldown_timer = DASH_COOLDOWN
+	dash_direction = last_direction
 
 func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("enemies"):

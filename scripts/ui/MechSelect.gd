@@ -31,6 +31,7 @@ func _ready() -> void:
 	_build_mech_buttons()
 	_build_mission_buttons()
 	$VBoxContainer/LaunchButton.pressed.connect(_on_launch_pressed)
+	$VBoxContainer/MechLabButton.pressed.connect(_on_mech_lab_pressed)
 	$VBoxContainer/BackButton.pressed.connect(_on_back_pressed)
 	selected_mech = MECH_DEFS[0]
 	selected_mission = MISSION_DEFS[0]
@@ -40,7 +41,8 @@ func _build_mech_buttons() -> void:
 	for mech in MECH_DEFS:
 		var btn := Button.new()
 		btn.toggle_mode = true
-		btn.custom_minimum_size = Vector2(160, 100)
+		btn.custom_minimum_size = Vector2(220, 110)
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
 		_update_mech_button_text(btn, mech)
 		btn.pressed.connect(_on_mech_pressed.bind(mech, btn))
 		$VBoxContainer/MechList.add_child(btn)
@@ -49,7 +51,21 @@ func _build_mech_buttons() -> void:
 
 func _update_mech_button_text(btn: Button, mech: MechDef) -> void:
 	var status: String = "" if SaveManager.is_unlocked(mech.mech_name) else "\nLOCKED - Cost: %d" % mech.unlock_cost
-	btn.text = "%s\n%s\nArmor: %.0f  Speed: %.0f%s" % [mech.mech_name, mech.weight_class, mech.max_armor, mech.max_speed, status]
+	var loadout_line: String = "" if status != "" else "\n%s" % _loadout_summary(mech)
+	btn.text = "%s\n%s\nHP: %.0f  Speed: %.0f%s%s" % [mech.mech_name, mech.weight_class, mech.max_armor, mech.max_speed, status, loadout_line]
+
+## One-line summary of the mech's saved loadout (or default loadout if none
+## has been saved yet) for display on the Mech Select screen.
+func _loadout_summary(mech: MechDef) -> String:
+	var loadout := SaveManager.get_loadout(mech)
+	var weapon_names: Array[String] = []
+	for item_key in loadout.get("items", []):
+		var w := ItemDatabase.get_weapon(item_key)
+		if w != null:
+			weapon_names.append("%s T%d" % [w.weapon_name, w.tier])
+	if weapon_names.is_empty():
+		return "Loadout: (empty)"
+	return "Loadout: " + ", ".join(weapon_names)
 
 func _on_mech_pressed(mech: MechDef, btn: Button) -> void:
 	if not SaveManager.is_unlocked(mech.mech_name):
@@ -88,6 +104,10 @@ func _on_launch_pressed() -> void:
 	GameState.reset_run(selected_mech)
 	GameState.current_mission = selected_mission
 	get_tree().change_scene_to_file("res://scenes/game/Arena.tscn")
+
+func _on_mech_lab_pressed() -> void:
+	GameState.current_mech = selected_mech
+	get_tree().change_scene_to_file("res://scenes/ui/MechLab.tscn")
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")

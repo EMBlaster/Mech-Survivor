@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="MissionDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="MissionDef" format=3 uid="uid://cftdtxhema3qi"]
 
-[ext_resource type="Script" path="res://scripts/MissionDef.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dc13gxyos78ua" path="res://scripts/MissionDef.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,4 +10,104 @@ base_difficulty = 3
 credit_reward = 900
 bonus_wave_reward = 350
 max_alive_enemies = 14
-wave_schedule = Array[Dictionary]([{"time": 0.0, "archetype": "scout", "count": 3, "tier_mult": 1.0}, {"time": 0.0, "archetype": "brawler", "count": 2, "tier_mult": 1.0}, {"time": 30.0, "archetype": "artillery", "count": 1, "tier_mult": 1.0}, {"time": 30.0, "archetype": "scout", "count": 3, "tier_mult": 1.0}, {"time": 60.0, "archetype": "brawler", "count": 3, "tier_mult": 1.0}, {"time": 60.0, "archetype": "artillery", "count": 1, "tier_mult": 1.0}, {"time": 90.0, "archetype": "scout", "count": 5, "tier_mult": 1.2}, {"time": 90.0, "archetype": "brawler", "count": 2, "tier_mult": 1.2}, {"time": 120.0, "archetype": "artillery", "count": 2, "tier_mult": 1.2}, {"time": 150.0, "archetype": "boss", "count": 1, "tier_mult": 1.0}, {"time": 180.0, "archetype": "scout", "count": 6, "tier_mult": 1.3}, {"time": 180.0, "archetype": "brawler", "count": 3, "tier_mult": 1.3}, {"time": 210.0, "archetype": "artillery", "count": 2, "tier_mult": 1.3}, {"time": 240.0, "archetype": "brawler", "count": 4, "tier_mult": 1.4}, {"time": 240.0, "archetype": "scout", "count": 4, "tier_mult": 1.4}, {"time": 280.0, "archetype": "artillery", "count": 3, "tier_mult": 1.4}, {"time": 320.0, "archetype": "brawler", "count": 5, "tier_mult": 1.5}, {"time": 320.0, "archetype": "scout", "count": 5, "tier_mult": 1.5}, {"time": 360.0, "archetype": "artillery", "count": 3, "tier_mult": 1.5}, {"time": 400.0, "archetype": "boss", "count": 2, "tier_mult": 1.2}])
+wave_schedule = Array[Dictionary]([{
+"archetype": "scout",
+"count": 3,
+"tier_mult": 1.0,
+"time": 0.0
+}, {
+"archetype": "brawler",
+"count": 2,
+"tier_mult": 1.0,
+"time": 0.0
+}, {
+"archetype": "artillery",
+"count": 1,
+"tier_mult": 1.0,
+"time": 30.0
+}, {
+"archetype": "scout",
+"count": 3,
+"tier_mult": 1.0,
+"time": 30.0
+}, {
+"archetype": "brawler",
+"count": 3,
+"tier_mult": 1.0,
+"time": 60.0
+}, {
+"archetype": "artillery",
+"count": 1,
+"tier_mult": 1.0,
+"time": 60.0
+}, {
+"archetype": "scout",
+"count": 5,
+"tier_mult": 1.2,
+"time": 90.0
+}, {
+"archetype": "brawler",
+"count": 2,
+"tier_mult": 1.2,
+"time": 90.0
+}, {
+"archetype": "artillery",
+"count": 2,
+"tier_mult": 1.2,
+"time": 120.0
+}, {
+"archetype": "boss",
+"count": 1,
+"tier_mult": 1.0,
+"time": 150.0
+}, {
+"archetype": "scout",
+"count": 6,
+"tier_mult": 1.3,
+"time": 180.0
+}, {
+"archetype": "brawler",
+"count": 3,
+"tier_mult": 1.3,
+"time": 180.0
+}, {
+"archetype": "artillery",
+"count": 2,
+"tier_mult": 1.3,
+"time": 210.0
+}, {
+"archetype": "brawler",
+"count": 4,
+"tier_mult": 1.4,
+"time": 240.0
+}, {
+"archetype": "scout",
+"count": 4,
+"tier_mult": 1.4,
+"time": 240.0
+}, {
+"archetype": "artillery",
+"count": 3,
+"tier_mult": 1.4,
+"time": 280.0
+}, {
+"archetype": "brawler",
+"count": 5,
+"tier_mult": 1.5,
+"time": 320.0
+}, {
+"archetype": "scout",
+"count": 5,
+"tier_mult": 1.5,
+"time": 320.0
+}, {
+"archetype": "artillery",
+"count": 3,
+"tier_mult": 1.5,
+"time": 360.0
+}, {
+"archetype": "boss",
+"count": 2,
+"tier_mult": 1.2,
+"time": 400.0
+}])
