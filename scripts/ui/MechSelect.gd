@@ -39,8 +39,25 @@ func _build_mech_buttons() -> void:
 	for mech in MECH_DEFS:
 		var btn := Button.new()
 		btn.toggle_mode = true
-		btn.custom_minimum_size = Vector2(220, 110)
+		btn.custom_minimum_size = Vector2(220, 160)
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
+		btn.clip_contents = true
+
+		var loadout_lbl := RichTextLabel.new()
+		loadout_lbl.name = "LoadoutLabel"
+		loadout_lbl.bbcode_enabled = true
+		loadout_lbl.scroll_active = false
+		loadout_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		loadout_lbl.anchor_left = 0
+		loadout_lbl.anchor_top = 1
+		loadout_lbl.anchor_right = 1
+		loadout_lbl.anchor_bottom = 1
+		loadout_lbl.offset_left = 6
+		loadout_lbl.offset_right = -6
+		loadout_lbl.offset_bottom = -4
+		loadout_lbl.offset_top = -58
+		btn.add_child(loadout_lbl)
+
 		_update_mech_button_text(btn, mech)
 		btn.pressed.connect(_on_mech_pressed.bind(mech, btn))
 		$VBoxContainer/MechList.add_child(btn)
@@ -48,22 +65,45 @@ func _build_mech_buttons() -> void:
 	mech_buttons[0].button_pressed = true
 
 func _update_mech_button_text(btn: Button, mech: MechDef) -> void:
-	var status: String = "" if SaveManager.is_unlocked(mech.mech_name) else "\nLOCKED - Cost: %d" % mech.unlock_cost
-	var loadout_line: String = "" if status != "" else "\n%s" % _loadout_summary(mech)
-	btn.text = "%s\n%s\nHP: %.0f  Speed: %.0f%s%s" % [mech.mech_name, mech.weight_class, mech.max_armor, mech.max_speed, status, loadout_line]
+	var locked := not SaveManager.is_unlocked(mech.mech_name)
+	if locked:
+		btn.text = "%s\n%s\nHP: %.0f  Speed: %.0f\nLOCKED - Cost: %d" % [
+			mech.mech_name, mech.weight_class, mech.max_armor, mech.max_speed, mech.unlock_cost]
+	else:
+		btn.text = "%s\n%s\nHP: %.0f  Speed: %.0f" % [
+			mech.mech_name, mech.weight_class, mech.max_armor, mech.max_speed]
+	var lbl: RichTextLabel = btn.get_node_or_null("LoadoutLabel")
+	if lbl == null:
+		return
+	lbl.text = "" if locked else _loadout_bbcode(mech)
 
-## One-line summary of the mech's saved loadout (or default loadout if none
-## has been saved yet) for display on the Mech Select screen.
-func _loadout_summary(mech: MechDef) -> String:
+func _loadout_bbcode(mech: MechDef) -> String:
 	var loadout := SaveManager.get_loadout(mech)
-	var weapon_names: Array[String] = []
+	var parts: Array[String] = []
 	for item_key in loadout.get("items", []):
+		if item_key.is_empty():
+			continue
 		var w := ItemDatabase.get_weapon(item_key)
-		if w != null:
-			weapon_names.append("%s T%d" % [w.weapon_name, w.tier])
-	if weapon_names.is_empty():
+		if w == null:
+			continue
+		var hex := _tier_color(w.tier).to_html(false)
+		var sym := ""
+		for corp in MissionBoard.CORPS:
+			if corp.corp_name == w.manufacturer and not corp.symbol.is_empty():
+				sym = corp.symbol + " "
+				break
+		parts.append("[color=#%s]%s%s[/color]" % [hex, sym, w.weapon_name])
+	if parts.is_empty():
 		return "Loadout: (empty)"
-	return "Loadout: " + ", ".join(weapon_names)
+	return "Loadout: " + ", ".join(parts)
+
+static func _tier_color(tier: int) -> Color:
+	match tier:
+		1: return Color(1.0, 1.0, 1.0)
+		2: return Color(0.3, 0.9, 0.3)
+		3: return Color(0.4, 0.6, 1.0)
+		4: return Color(0.8, 0.4, 1.0)
+		_: return Color(1.0, 0.85, 0.2)
 
 func _on_mech_pressed(mech: MechDef, btn: Button) -> void:
 	if not SaveManager.is_unlocked(mech.mech_name):
