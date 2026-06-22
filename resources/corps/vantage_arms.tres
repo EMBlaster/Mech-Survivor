@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CorpDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/CorpDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+corp_name = "Vantage Arms"
+philosophy = "Precision craftsmanship. Every shot placed, not sprayed."
+trait_pool = Array[String](["range_bonus", "velocity_bonus"])
+availability = 0.8
+price_multiplier = 1.25
+color = Color(0.4, 0.6, 1.0, 1)

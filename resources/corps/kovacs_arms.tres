@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CorpDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/CorpDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+corp_name = "Kovacs Arms"
+philosophy = "Designed by veterans. Overbuilt by choice."
+trait_pool = Array[String](["damage_bonus", "cooldown_penalty", "weight_penalty"])
+availability = 0.5
+price_multiplier = 1.4
+color = Color(0.2, 0.4, 0.2, 1)

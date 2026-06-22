@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CorpDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/CorpDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+corp_name = "Salvo Systems"
+philosophy = "Maximum ordnance. Minimum regret."
+trait_pool = Array[String](["damage_bonus", "splash_bonus"])
+availability = 0.8
+price_multiplier = 1.15
+color = Color(1.0, 0.3, 0.1, 1)

@@ -12,15 +12,24 @@ const SYNTH_HEAT_SCALE: float = 0.95
 const SYNTH_WEIGHT_ADD: float = 1.0
 const CRAFTED_DIR: String = "res://resources/weapons/crafted/"
 
-## output_tier -> number of manufacturer bonus slots selectable
-## (T2->1, T3->2, T4->3, T5->4 per spec 7.2)
-const TIER_BONUS_SLOTS: Dictionary = {2: 1, 3: 2, 4: 3, 5: 4}
+## output_tier -> max traits the player may inherit (tier number = max traits).
+## T2 craft can carry 2 traits, T3 can carry 3, etc.
+const TIER_BONUS_SLOTS: Dictionary = {2: 2, 3: 3, 4: 4, 5: 5}
 
-## manufacturer -> Array[{"stat": String, "modifier": float, "label": String}]
-## Standard components contribute no bonus options. No manufacturer variants
-## exist in the current weapon roster, so this pool is empty until variant
-## weapon data is added.
-const MANUFACTURER_BONUSES: Dictionary = {}
+## manufacturer -> Array[String] of trait IDs this corp's weapons can carry.
+## Populated as corp-branded weapon resources are added to the game.
+## Continental Defense has no traits by design -- Standard/generic weapons map here too.
+const MANUFACTURER_BONUSES: Dictionary = {
+	"Vantage Arms":         ["range_bonus", "velocity_bonus"],
+	"Quickfire Industries": ["cooldown_reduction", "weight_reduction", "damage_penalty"],
+	"Ironforge Munitions":  ["damage_bonus", "weight_penalty"],
+	"Kovacs Arms":          ["damage_bonus", "cooldown_penalty", "weight_penalty"],
+	"Helix Energy Systems": ["cooldown_reduction", "range_bonus"],
+	"Salvo Systems":        ["damage_bonus", "splash_bonus"],
+	"Axiom Dynamics":       ["damage_bonus", "range_bonus", "cooldown_penalty", "damage_penalty"],
+	"Crucible Heavy":       ["damage_bonus", "weight_penalty", "range_penalty"],
+	"Redline Surplus":      ["weight_reduction", "cooldown_reduction"],
+}
 
 ## Returns one entry per (weapon_name, manufacturer, tier) group with
 ## qty >= CRAFT_COST and tier < MAX_TIER: {"weapon": WeaponDef, "qty": int}
@@ -35,10 +44,14 @@ func get_craftable_groups() -> Array[Dictionary]:
 			groups.append({"weapon": w, "qty": owned})
 	return groups
 
-## Manufacturer bonus options available for this craft, derived from the
-## manufacturer of the 4 input components.
+## Trait options available for this craft, derived from the manufacturer of
+## the input components. Returns Array of {trait_id, label} dicts for the UI.
 func get_bonus_pool(base: WeaponDef) -> Array:
-	return MANUFACTURER_BONUSES.get(base.manufacturer, [])
+	var trait_ids: Array = MANUFACTURER_BONUSES.get(base.manufacturer, [])
+	var result: Array = []
+	for tid: String in trait_ids:
+		result.append({"trait_id": tid, "label": TraitResolver.label(tid)})
+	return result
 
 func get_bonus_slot_count(output_tier: int) -> int:
 	return TIER_BONUS_SLOTS.get(output_tier, 0)
@@ -62,20 +75,27 @@ func _synthesize_tier(base: WeaponDef, target_tier: int) -> WeaponDef:
 	out.weight = base.weight + SYNTH_WEIGHT_ADD * steps
 	return out
 
-## Returns a duplicate of `output` with the selected bonuses' stat modifiers
-## applied -- used for both the live preview and the final crafted item.
+## Returns a duplicate of `output` with the selected traits applied.
+## Each bonus dict must have a "trait_id" key (from get_bonus_pool).
+## Writes trait IDs to result.traits AND bakes the stat multipliers in so
+## the preview and final item display accurate stats.
 func apply_bonuses(output: WeaponDef, bonuses: Array) -> WeaponDef:
 	var result: WeaponDef = output.duplicate()
-	for bonus in bonuses:
-		match bonus.get("stat", ""):
-			"damage":
-				result.damage *= bonus["modifier"]
-			"heat":
-				result.heat *= bonus["modifier"]
-			"fire_range":
-				result.fire_range *= bonus["modifier"]
-			"weight":
-				result.weight *= bonus["modifier"]
+	result.traits = []
+	for bonus: Dictionary in bonuses:
+		var trait_id: String = bonus.get("trait_id", "")
+		if trait_id.is_empty():
+			continue
+		result.traits.append(trait_id)
+		var mod: Dictionary = TraitResolver.MODIFIERS.get(trait_id, {})
+		for stat_key: String in mod:
+			match stat_key:
+				"damage":           result.damage           *= mod[stat_key]
+				"fire_range":       result.fire_range       *= mod[stat_key]
+				"heat":             result.heat             *= mod[stat_key]
+				"weight":           result.weight           *= mod[stat_key]
+				"projectile_speed": result.projectile_speed *= mod[stat_key]
+				"aoe_radius":       result.aoe_radius       *= mod[stat_key]
 	return result
 
 ## Consumes 4x `base` and adds the crafted Tier N+1 weapon (with selected

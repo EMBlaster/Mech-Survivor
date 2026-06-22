@@ -8,6 +8,7 @@ const HEAT_COOLDOWN_MULTIPLIER: float = 0.4
 @export var weapon_type: String = ""         # "autocannon" / "laser" / "missile"
 @export var manufacturer: String = "Standard"
 @export var tier: int = 1                    # 1-5
+@export var traits: Array[String] = []       # trait IDs applied at read time via TraitResolver
 @export var damage: float = 10.0
 @export var fire_range: float = 300.0
 @export var heat: float = 1.0                # drives cooldown via HEAT_COOLDOWN_MULTIPLIER

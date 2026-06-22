@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CorpDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/CorpDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+corp_name = "Crucible Heavy"
+philosophy = "Industrial scale. Not subtle. Not intended to be."
+trait_pool = Array[String](["damage_bonus", "weight_penalty", "range_penalty"])
+availability = 0.9
+price_multiplier = 1.0
+color = Color(0.5, 0.25, 0.0, 1)

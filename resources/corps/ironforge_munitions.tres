@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CorpDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/CorpDef.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+corp_name = "Ironforge Munitions"
+philosophy = "Built to last. Hits like it means it."
+trait_pool = Array[String](["damage_bonus", "weight_penalty"])
+availability = 1.0
+price_multiplier = 1.1
+color = Color(0.6, 0.3, 0.1, 1)
