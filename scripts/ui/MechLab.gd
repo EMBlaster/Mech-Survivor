@@ -28,7 +28,7 @@ var armor_label: Label = null
 
 # Crafting sub-panel state
 var crafting_group: Dictionary = {}      # {"weapon": WeaponDef, "qty": int}
-var crafting_bonuses: Array = []         # selected entries from CraftingSystem.get_bonus_pool()
+var crafting_bonuses: Array[String] = [] # selected trait IDs from CraftingSystem.combine_weapons()
 var crafting_group_buttons: Array[Button] = []
 var crafting_bonus_checks: Array[CheckBox] = []
 
@@ -294,9 +294,11 @@ func _update_slots() -> void:
 		if item_key == "":
 			btn.text = ""
 			btn.modulate = Color(1, 1, 1, 0.4)
+			btn.tooltip_text = ""
 		else:
 			btn.text = _slot_display_text(item_key)
 			btn.modulate = Color(1, 1, 1, 1)
+			btn.tooltip_text = _weapon_trait_tooltip(ItemDatabase.get_weapon(item_key))
 
 func _slot_display_text(key: String) -> String:
 	var w := ItemDatabase.get_weapon(key)
@@ -357,9 +359,15 @@ func _rebuild_inventory() -> void:
 			var available: int = owned - _placed_count(key)
 			if valid_only and (available <= 0 or current_weight + w.weight > current_mech.free_tonnage or empty_slots <= 0):
 				continue
-			var label := "x%d  %s  T%d  [%.1ft]  DMG %.0f  RNG %.0f" % \
-				[available, w.weapon_name, w.tier, w.weight, w.damage, w.fire_range]
-			_add_inventory_row(key, label, available > 0)
+			var eff := TraitResolver.get_effective_stats(w)
+			var trait_tag := _weapon_trait_summary(w)
+			var label := "x%d  %s  T%d  [%.1ft]  DMG %.0f  RNG %.0f%s" % [
+				available, w.weapon_name, w.tier,
+				eff.get("weight", w.weight),
+				eff.get("damage", w.damage),
+				eff.get("fire_range", w.fire_range),
+				trait_tag]
+			_add_inventory_row(key, label, available > 0, _weapon_trait_tooltip(w))
 
 	if inventory_filter in ["ALL", "Equipment"]:
 		for e in ItemDatabase.get_all_equipment():
@@ -386,12 +394,13 @@ func _rebuild_inventory() -> void:
 				[available, bin.ammo_type.capitalize(), bin.weight, bin.ammo_provided]
 			_add_inventory_row(key, label, available > 0)
 
-func _add_inventory_row(key: String, label: String, can_place: bool) -> void:
+func _add_inventory_row(key: String, label: String, can_place: bool, tooltip: String = "") -> void:
 	var btn := Button.new()
 	btn.text = label
 	btn.toggle_mode = true
 	btn.button_pressed = (placement_item_key == key)
 	btn.disabled = not can_place and placement_item_key != key
+	btn.tooltip_text = tooltip
 	btn.pressed.connect(_on_inventory_item_pressed.bind(key))
 	$MainVBox/ContentHBox/LeftPanel/InventoryScroll/InventoryList.add_child(btn)
 
@@ -615,7 +624,7 @@ func _build_crafting_overlay() -> void:
 	margin.add_child(vbox)
 
 	var title := Label.new()
-	title.text = "CRAFTING -- 4x Tier N -> 1x Tier N+1 (consumes the 4 inputs)"
+	title.text = "CRAFTING — 4x T[N] → 1x T[N+1]  |  Inherited traits carry forward from source weapons"
 	vbox.add_child(title)
 
 	var body := HBoxContainer.new()
@@ -733,27 +742,28 @@ func _update_crafting_preview() -> void:
 	var raw_output := CraftingSystem.get_next_tier_weapon(base)
 	var output_tier: int = raw_output.tier
 	var slot_count := CraftingSystem.get_bonus_slot_count(output_tier)
-	var pool := CraftingSystem.get_bonus_pool(base)
+	var pool := CraftingSystem.combine_weapons([base])
 
 	if pool.is_empty():
-		bonus_header.text = "Manufacturer bonuses: none available from these inputs (%d slot(s) at T%d)" % [slot_count, output_tier]
+		bonus_header.text = "Traits to inherit: none on source weapons (%d slot(s) at T%d)" % [slot_count, output_tier]
 	else:
-		bonus_header.text = "Manufacturer bonuses (choose up to %d):" % slot_count
-		for bonus in pool:
+		bonus_header.text = "Inherit traits (choose up to %d from source weapons):" % slot_count
+		for entry: Dictionary in pool:
+			var trait_id: String = entry.get("trait_id", "")
 			var check := CheckBox.new()
-			check.text = bonus.get("label", "")
-			check.button_pressed = bonus in crafting_bonuses
-			check.toggled.connect(_on_bonus_toggled.bind(bonus))
+			check.text = "%s  [from: %s]" % [entry.get("label", trait_id), entry.get("source", "?")]
+			check.button_pressed = trait_id in crafting_bonuses
+			check.toggled.connect(_on_trait_toggled.bind(trait_id))
 			bonus_list.add_child(check)
 			crafting_bonus_checks.append(check)
 
-	var preview_weapon := CraftingSystem.apply_bonuses(raw_output, crafting_bonuses)
+	var preview_weapon := CraftingSystem.preview_upgrade(base, crafting_bonuses)
 	output_label.text = "Output: 1x %s T%d  (DMG %.0f, Heat %.1f, RNG %.0f, %.1ft)" % \
 		[preview_weapon.weapon_name, preview_weapon.tier, preview_weapon.damage, preview_weapon.heat, preview_weapon.fire_range, preview_weapon.weight]
 
 	confirm_btn.disabled = false
 
-func _on_bonus_toggled(pressed: bool, bonus: Dictionary) -> void:
+func _on_trait_toggled(pressed: bool, trait_id: String) -> void:
 	var base: WeaponDef = crafting_group["weapon"]
 	var raw_output := CraftingSystem.get_next_tier_weapon(base)
 	var slot_count := CraftingSystem.get_bonus_slot_count(raw_output.tier)
@@ -761,16 +771,46 @@ func _on_bonus_toggled(pressed: bool, bonus: Dictionary) -> void:
 		if crafting_bonuses.size() >= slot_count:
 			_update_crafting_preview()
 			return
-		crafting_bonuses.append(bonus)
+		crafting_bonuses.append(trait_id)
 	else:
-		crafting_bonuses.erase(bonus)
+		crafting_bonuses.erase(trait_id)
 	_update_crafting_preview()
+
+## One-line trait summary for inventory rows, e.g. "  [+15% dmg | -10% rng]".
+## Returns "" when the weapon has no traits.
+func _weapon_trait_summary(w: WeaponDef) -> String:
+	if w == null or w.traits.is_empty():
+		return ""
+	var labels: Array[String] = []
+	for t in w.traits:
+		labels.append(TraitResolver.label(t))
+	return "  [%s]" % " | ".join(labels)
+
+## Multi-line tooltip showing effective stats and all traits for a weapon.
+## Returns "" for null weapons or weapons with no traits.
+func _weapon_trait_tooltip(w: WeaponDef) -> String:
+	if w == null or w.traits.is_empty():
+		return ""
+	var eff := TraitResolver.get_effective_stats(w)
+	var lines: Array[String] = [
+		"%s T%d — %s" % [w.weapon_name, w.tier, w.manufacturer if not w.manufacturer.is_empty() else "Salvage"],
+		"Effective: DMG %.0f  RNG %.0f  Heat %.1f  Wt %.1f" % [
+			eff.get("damage", w.damage),
+			eff.get("fire_range", w.fire_range),
+			eff.get("heat", w.heat),
+			eff.get("weight", w.weight),
+		],
+		"Traits:",
+	]
+	for t in w.traits:
+		lines.append("  • %s" % TraitResolver.label(t))
+	return "\n".join(lines)
 
 func _on_craft_confirm_pressed() -> void:
 	if crafting_group.is_empty():
 		return
 	var base: WeaponDef = crafting_group["weapon"]
-	CraftingSystem.craft(base, crafting_bonuses)
+	CraftingSystem.finalize_upgrade(base, crafting_bonuses)
 	crafting_group = {}
 	crafting_bonuses = []
 	_rebuild_crafting_groups()

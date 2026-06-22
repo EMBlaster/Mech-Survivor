@@ -44,8 +44,60 @@ func get_craftable_groups() -> Array[Dictionary]:
 			groups.append({"weapon": w, "qty": owned})
 	return groups
 
-## Trait options available for this craft, derived from the manufacturer of
-## the input components. Returns Array of {trait_id, label} dicts for the UI.
+## De-duplicated trait pool from the source weapons' existing traits arrays.
+## Each entry: {trait_id, label, source} where source is the weapon name that
+## contributed the trait. This is the Phase 5 replacement for get_bonus_pool.
+func combine_weapons(sources: Array[WeaponDef]) -> Array[Dictionary]:
+	var seen: Array[String] = []
+	var result: Array[Dictionary] = []
+	for w in sources:
+		for trait_id: String in w.traits:
+			if trait_id not in seen:
+				seen.append(trait_id)
+				result.append({
+					"trait_id": trait_id,
+					"label": TraitResolver.label(trait_id),
+					"source": w.weapon_name,
+				})
+	return result
+
+## Preview the crafted weapon with chosen traits applied, without consuming
+## resources or persisting. Output manufacturer is "" (salvage amalgam).
+func preview_upgrade(base: WeaponDef, chosen_traits: Array[String]) -> WeaponDef:
+	var output: WeaponDef = get_next_tier_weapon(base).duplicate()
+	output.manufacturer = ""
+	output.traits = chosen_traits.duplicate()
+	for trait_id: String in chosen_traits:
+		var mod: Dictionary = TraitResolver.MODIFIERS.get(trait_id, {})
+		for stat_key: String in mod:
+			match stat_key:
+				"damage":           output.damage           *= mod[stat_key]
+				"fire_range":       output.fire_range       *= mod[stat_key]
+				"heat":             output.heat             *= mod[stat_key]
+				"weight":           output.weight           *= mod[stat_key]
+				"projectile_speed": output.projectile_speed *= mod[stat_key]
+				"aoe_radius":       output.aoe_radius       *= mod[stat_key]
+	return output
+
+## Consumes 4x base, produces T(N+1) with chosen_traits inherited, persists it.
+## Output manufacturer = "" (field-built amalgam, no corp stamp).
+## chosen_traits: Array[String] of trait IDs (up to TIER_BONUS_SLOTS[output_tier]).
+func finalize_upgrade(base: WeaponDef, chosen_traits: Array[String]) -> WeaponDef:
+	var input_key := SaveManager.weapon_key(base)
+	var owned: int = SaveManager.owned_weapons.get(input_key, 0)
+	SaveManager.owned_weapons[input_key] = owned - CRAFT_COST
+	if SaveManager.owned_weapons[input_key] <= 0:
+		SaveManager.owned_weapons.erase(input_key)
+	var output := preview_upgrade(base, chosen_traits)
+	var output_key := SaveManager.weapon_key(output)
+	if not ItemDatabase.weapons_by_key.has(output_key):
+		_persist_crafted_weapon(output, output_key)
+		ItemDatabase.weapons_by_key[output_key] = output
+	SaveManager.add_owned_weapon(output)
+	return output
+
+## Legacy: trait options from manufacturer lookup. Kept for reference.
+## Use combine_weapons() for new code.
 func get_bonus_pool(base: WeaponDef) -> Array:
 	var trait_ids: Array = MANUFACTURER_BONUSES.get(base.manufacturer, [])
 	var result: Array = []
