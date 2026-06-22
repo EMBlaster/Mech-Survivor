@@ -134,8 +134,8 @@ func _spawn_bonus_wave() -> void:
 		return
 	GameState.is_bonus_wave = true
 	bonus_wave_alive = BONUS_WAVE_SIZE
-	var scaling_steps := floor(elapsed_time / SCALING_INTERVAL)
-	var diff_mult := mission.base_difficulty * BONUS_WAVE_DIFFICULTY_BONUS * pow(SCALING_FACTOR, scaling_steps)
+	var scaling_steps: float = floor(elapsed_time / SCALING_INTERVAL)
+	var diff_mult: float = mission.base_difficulty * BONUS_WAVE_DIFFICULTY_BONUS * pow(SCALING_FACTOR, scaling_steps)
 	for i in BONUS_WAVE_SIZE:
 		var archetype: String = FILLER_ARCHETYPES[randi() % FILLER_ARCHETYPES.size()]
 		var def: EnemyDef = ARCHETYPE_DEFS.get(archetype)
