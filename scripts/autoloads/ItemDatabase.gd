@@ -15,9 +15,13 @@ var equipment_by_key: Dictionary = {}
 var ammo_bins_by_key: Dictionary = {}
 var mechs: Array[MechDef] = []
 
+const BRANDED_WEAPON_DIR := "user://branded_weapons/"
+
 func _ready() -> void:
 	_load_dir(WEAPON_DIR, func(res): weapons_by_key[SaveManager.weapon_key(res)] = res)
 	_load_dir(CRAFTED_WEAPON_DIR, func(res): weapons_by_key[SaveManager.weapon_key(res)] = res)
+	DirAccess.make_dir_absolute(BRANDED_WEAPON_DIR)
+	_load_dir(BRANDED_WEAPON_DIR, func(res): weapons_by_key[SaveManager.weapon_key(res)] = res)
 	_load_dir(EQUIPMENT_DIR, func(res): equipment_by_key[SaveManager.equipment_key(res)] = res)
 	_load_dir(AMMO_DIR, func(res): ammo_bins_by_key[SaveManager.ammo_bin_key(res)] = res)
 	_load_dir(MECH_DIR, func(res): mechs.append(res))

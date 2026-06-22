@@ -12,6 +12,7 @@ func _ready() -> void:
 
 func _on_mission_complete(credits_earned: int) -> void:
 	_apply_mission_rep(true)
+	_grant_corp_store_access()
 	_show_result("MISSION COMPLETE", credits_earned)
 
 func _on_player_died(credits_earned: int) -> void:
@@ -21,6 +22,14 @@ func _on_player_died(credits_earned: int) -> void:
 func _on_mission_extract_failed() -> void:
 	_apply_mission_rep(false)
 	_show_result("EXTRACTED EARLY - NO REWARD", 0)
+
+## Grants corp store access after a successful sponsored mission.
+func _grant_corp_store_access() -> void:
+	var mission := GameState.current_mission
+	if mission == null or mission.sponsored_by_corp.is_empty():
+		return
+	SaveManager.corp_store_access = mission.sponsored_by_corp
+	SaveManager.save()
 
 ## Applies rep change for corp-sponsored missions. Success: +10, failure: -20.
 func _apply_mission_rep(success: bool) -> void:

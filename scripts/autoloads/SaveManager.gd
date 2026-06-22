@@ -21,6 +21,10 @@ var active_loadout: Dictionary = {}
 ## Breaking relationships is fast, rebuilding is slow or impossible.
 var corp_reputation: Dictionary = {}
 
+## Corp whose store the pilot has access to this cycle. Set on successful
+## corp-sponsored mission; cleared when the player leaves the corp store.
+var corp_store_access: String = ""
+
 signal rep_changed(corp: String, new_val: int)
 
 ## Corp goes dark (stops appearing on the mission board) at or below this value.
@@ -43,6 +47,7 @@ func save() -> void:
 	config.set_value("loadouts", "mech_loadouts", mech_loadouts)
 	config.set_value("loadouts", "active_loadout", active_loadout)
 	config.set_value("reputation", "corp_reputation", corp_reputation)
+	config.set_value("reputation", "corp_store_access", corp_store_access)
 	config.save(SAVE_PATH)
 
 func load_save() -> void:
@@ -58,6 +63,7 @@ func load_save() -> void:
 	mech_loadouts = config.get_value("loadouts", "mech_loadouts", {})
 	active_loadout = config.get_value("loadouts", "active_loadout", {})
 	corp_reputation = config.get_value("reputation", "corp_reputation", {})
+	corp_store_access = config.get_value("reputation", "corp_store_access", "")
 	_discard_old_format_loadouts()
 
 ## Old saves stored loadouts as { "locations": {...}, "armor": {...} } (per
