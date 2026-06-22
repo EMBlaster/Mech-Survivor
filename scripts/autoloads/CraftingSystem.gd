@@ -72,8 +72,8 @@ func apply_bonuses(output: WeaponDef, bonuses: Array) -> WeaponDef:
 				result.damage *= bonus["modifier"]
 			"heat":
 				result.heat *= bonus["modifier"]
-			"range":
-				result.range *= bonus["modifier"]
+			"fire_range":
+				result.fire_range *= bonus["modifier"]
 			"weight":
 				result.weight *= bonus["modifier"]
 	return result

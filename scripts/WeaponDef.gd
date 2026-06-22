@@ -9,7 +9,7 @@ const HEAT_COOLDOWN_MULTIPLIER: float = 0.4
 @export var manufacturer: String = "Standard"
 @export var tier: int = 1                    # 1-5
 @export var damage: float = 10.0
-@export var range: float = 300.0
+@export var fire_range: float = 300.0
 @export var heat: float = 1.0                # drives cooldown via HEAT_COOLDOWN_MULTIPLIER
 @export var projectile_speed: float = 400.0
 @export var aoe_radius: float = 0.0          # 0 = no AoE

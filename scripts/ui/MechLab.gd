@@ -358,7 +358,7 @@ func _rebuild_inventory() -> void:
 			if valid_only and (available <= 0 or current_weight + w.weight > current_mech.free_tonnage or empty_slots <= 0):
 				continue
 			var label := "x%d  %s  T%d  [%.1ft]  DMG %.0f  RNG %.0f" % \
-				[available, w.weapon_name, w.tier, w.weight, w.damage, w.range]
+				[available, w.weapon_name, w.tier, w.weight, w.damage, w.fire_range]
 			_add_inventory_row(key, label, available > 0)
 
 	if inventory_filter in ["ALL", "Equipment"]:
@@ -728,7 +728,7 @@ func _update_crafting_preview() -> void:
 
 	var base: WeaponDef = crafting_group["weapon"]
 	input_label.text = "Input: 4x %s T%d  (DMG %.0f, Heat %.1f, RNG %.0f, %.1ft)" % \
-		[base.weapon_name, base.tier, base.damage, base.heat, base.range, base.weight]
+		[base.weapon_name, base.tier, base.damage, base.heat, base.fire_range, base.weight]
 
 	var raw_output := CraftingSystem.get_next_tier_weapon(base)
 	var output_tier: int = raw_output.tier
@@ -749,7 +749,7 @@ func _update_crafting_preview() -> void:
 
 	var preview_weapon := CraftingSystem.apply_bonuses(raw_output, crafting_bonuses)
 	output_label.text = "Output: 1x %s T%d  (DMG %.0f, Heat %.1f, RNG %.0f, %.1ft)" % \
-		[preview_weapon.weapon_name, preview_weapon.tier, preview_weapon.damage, preview_weapon.heat, preview_weapon.range, preview_weapon.weight]
+		[preview_weapon.weapon_name, preview_weapon.tier, preview_weapon.damage, preview_weapon.heat, preview_weapon.fire_range, preview_weapon.weight]
 
 	confirm_btn.disabled = false
 

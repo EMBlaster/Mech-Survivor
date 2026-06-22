@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dq7vxk2m4rwth"]
 
-[ext_resource type="Script" uid="uid://c3pq8m1k5vwxz" path="res://scripts/ui/MechLab.gd" id="1_mechlab"]
+[ext_resource type="Script" uid="uid://j4u5s8aludoy" path="res://scripts/ui/MechLab.gd" id="1_mechlab"]
 
 [node name="MechLab" type="Control" unique_id=70010001]
 layout_mode = 3

@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://ca86hittdg5ge" path="res://scenes/ui/MissionResult.tscn" id="6_oc6ea"]
 [ext_resource type="Script" uid="uid://ba0o7ihow8arn" path="res://scripts/ui/MissionResult.gd" id="7_7n2tc"]
 [ext_resource type="PackedScene" uid="uid://dxs1pj2c4hs7v" path="res://scenes/ui/ExceptionalSalvage.tscn" id="8_oc6ea"]
-[ext_resource type="Script" uid="uid://b0fq8j2g3mxqy" path="res://scripts/ui/ExceptionalSalvage.gd" id="9_oc6ea"]
+[ext_resource type="Script" uid="uid://cmrd1aj0t22hc" path="res://scripts/ui/ExceptionalSalvage.gd" id="9_oc6ea"]
 
 [node name="Arena" type="Node2D" unique_id=1870294851]
 script = ExtResource("1_fukgj")
@@ -48,6 +48,24 @@ layout_mode = 2
 modulate = Color(0.3, 1, 0.4, 1)
 custom_minimum_size = Vector2(220, 18)
 layout_mode = 2
+
+[node name="BossBar" type="VBoxContainer" parent="HUD" unique_id=801631412]
+offset_left = 16.0
+offset_top = 62.0
+offset_right = 240.0
+offset_bottom = 96.0
+visible = false
+
+[node name="BossLabel" type="Label" parent="HUD/BossBar" unique_id=801631413]
+layout_mode = 2
+modulate = Color(1, 0.3, 0.3, 1)
+text = "BOSS"
+
+[node name="BossHealthBar" type="ProgressBar" parent="HUD/BossBar" unique_id=801631414]
+modulate = Color(1, 0.3, 0.3, 1)
+custom_minimum_size = Vector2(220, 18)
+layout_mode = 2
+show_percentage = false
 
 [node name="TopRight" type="Label" parent="HUD" unique_id=100163412]
 anchors_preset = 1

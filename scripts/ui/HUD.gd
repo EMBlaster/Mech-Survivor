@@ -36,6 +36,7 @@ func _process(_delta: float) -> void:
 	_update_weapon_cooldowns()
 	_update_ammo_pool_label()
 	_update_dash_indicator()
+	_update_boss_bar()
 
 func _on_health_changed(current: float, max_value: float) -> void:
 	$TopLeft/ArmorBar.max_value = max_value
@@ -54,12 +55,14 @@ func _update_xp_bar() -> void:
 ## Standard salvage (spec 7.1) replaces the old level-up weapon-choice
 ## offer: a small reward is granted immediately and shown as a brief,
 ## non-interrupting drop notification.
-func _on_level_up(_new_level: int) -> void:
-	_update_xp_bar()
-	var msg := SalvageSystem.roll_standard_salvage()
-	$SalvageNotice.text = msg
+func show_notice(text: String) -> void:
+	$SalvageNotice.text = text
 	$SalvageNotice.visible = true
 	$SalvageNotice/HideTimer.start()
+
+func _on_level_up(_new_level: int) -> void:
+	_update_xp_bar()
+	show_notice(SalvageSystem.roll_standard_salvage())
 
 func _on_xp_changed(_current_xp: int, _current_level: int) -> void:
 	_update_xp_bar()
@@ -78,7 +81,7 @@ func _update_timer_label() -> void:
 		$TopRight.text = _format_time(t)
 
 func _format_time(t: float) -> String:
-	var minutes: int = int(t) / 60
+	var minutes: int = int(t / 60.0)
 	var seconds: int = int(t) % 60
 	return "%02d:%02d" % [minutes, seconds]
 
@@ -140,7 +143,7 @@ func _update_weapon_cooldowns() -> void:
 			continue
 		var wc: WeaponComponent = player.weapon_components[i]
 		var overlay: ColorRect = weapon_icons[i].get_node("Overlay")
-		var frac: float = clamp(wc.cooldown_timer / wc.weapon_def.get_cooldown(), 0.0, 1.0)
+		var frac: float = clamp(wc.cooldown_timer / (wc.weapon_def.get_cooldown() * GameState.heat_sink_multiplier), 0.0, 1.0)
 		overlay.size = Vector2(48, 48 * frac)
 		overlay.position = Vector2(0, 0)
 		_update_ammo_label(weapon_icons[i].get_node("AmmoLabel"), wc.weapon_def)
@@ -181,3 +184,17 @@ func _update_dash_indicator() -> void:
 	var frac: float = clamp(player.dash_cooldown_timer / player.DASH_COOLDOWN, 0.0, 1.0)
 	overlay.size = Vector2(48, 48 * frac)
 	overlay.position = Vector2(0, 0)
+
+func _update_boss_bar() -> void:
+	var boss: Node = null
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e.enemy_def != null and e.enemy_def.archetype == "boss":
+			boss = e
+			break
+	if boss == null:
+		$BossBar.visible = false
+		return
+	$BossBar.visible = true
+	var health_bar: ProgressBar = boss.get_node("HealthBar")
+	$BossBar/BossHealthBar.max_value = health_bar.max_value
+	$BossBar/BossHealthBar.value = boss.current_armor

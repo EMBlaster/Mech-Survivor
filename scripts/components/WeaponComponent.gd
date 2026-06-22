@@ -21,8 +21,8 @@ func _draw() -> void:
 	var color := _range_color(weapon_def.weapon_type)
 	if out_of_ammo:
 		return
-	draw_circle(Vector2.ZERO, weapon_def.range, Color(color.r, color.g, color.b, 0.05))
-	draw_arc(Vector2.ZERO, weapon_def.range, 0, TAU, 64, Color(color.r, color.g, color.b, 0.35), 1.5)
+	draw_circle(Vector2.ZERO, weapon_def.fire_range, Color(color.r, color.g, color.b, 0.05))
+	draw_arc(Vector2.ZERO, weapon_def.fire_range, 0, TAU, 64, Color(color.r, color.g, color.b, 0.35), 1.5)
 
 func _range_color(weapon_type: String) -> Color:
 	match weapon_type:
@@ -56,13 +56,13 @@ func _try_fire() -> void:
 	if target == null:
 		return
 	var dist := global_position.distance_to(target.global_position)
-	if dist > weapon_def.range:
+	if dist > weapon_def.fire_range:
 		return
 	if not GameState.has_ammo(weapon_def):
 		return
 	_spawn_projectile(target)
 	GameState.consume_ammo(weapon_def)
-	cooldown_timer = weapon_def.get_cooldown()
+	cooldown_timer = weapon_def.get_cooldown() * GameState.heat_sink_multiplier
 
 func _find_nearest_enemy() -> Node2D:
 	var enemies := get_tree().get_nodes_in_group("enemies")

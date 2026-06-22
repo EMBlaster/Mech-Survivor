@@ -23,25 +23,33 @@ func _ready() -> void:
 	add_to_group("player")
 	var mech_def: MechDef = GameState.current_mech
 	speed = mech_def.max_speed
-	$Sprite.color = _color_for_weight_class(mech_def.weight_class)
+	var tex: Texture2D = _texture_for_weight_class(mech_def.weight_class)
+	if tex:
+		$Sprite.texture = tex
+		var s := 36.0 / maxf(tex.get_width(), tex.get_height())
+		$Sprite.scale = Vector2(s, s)
 	$HealthComponent.setup(mech_def.structure + GameState.current_armor)
 	$HealthComponent.died.connect(_on_died)
 	$Hitbox.body_entered.connect(_on_hitbox_body_entered)
 	$Hitbox.body_exited.connect(_on_hitbox_body_exited)
 	rebuild_weapons()
 
-func _color_for_weight_class(weight_class: String) -> Color:
+func _texture_for_weight_class(weight_class: String) -> Texture2D:
+	var path: String
 	match weight_class:
 		"Light":
-			return Color(0.3, 0.6, 1.0)
+			path = "res://assets/kenney_robot_pack/PNG/Top view/robot_blue.png"
 		"Medium":
-			return Color(0.3, 0.9, 0.6)
+			path = "res://assets/kenney_robot_pack/PNG/Top view/robot_green.png"
 		"Heavy":
-			return Color(0.9, 0.7, 0.2)
+			path = "res://assets/kenney_robot_pack/PNG/Top view/robot_yellow.png"
 		"Assault":
-			return Color(0.85, 0.2, 0.55)
+			path = "res://assets/kenney_robot_pack/PNG/Top view/robot_red.png"
 		_:
-			return Color(0.5, 0.5, 0.9)
+			path = "res://assets/kenney_robot_pack/PNG/Top view/robot_blue.png"
+	if ResourceLoader.exists(path):
+		return load(path) as Texture2D
+	return null
 
 func rebuild_weapons() -> void:
 	for wc in weapon_components:

@@ -22,6 +22,10 @@ func _ready() -> void:
 	$Camera2D.global_position = player.global_position
 	$EnemySpawner.setup(GameState.current_mission)
 	$EnemySpawner.boss_defeated.connect(_on_boss_defeated)
+	$EnemySpawner.bonus_wave_started.connect(func(reward: int):
+		$HUD.show_notice("BONUS WAVE! Clear for +%d credits" % reward))
+	$EnemySpawner.bonus_wave_cleared.connect(func(reward: int):
+		$HUD.show_notice("Bonus wave cleared! +%d credits banked" % reward))
 	$HUD.refresh(player)
 	$HUD.extract_requested.connect(_on_extract_requested)
 

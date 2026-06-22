@@ -45,6 +45,7 @@ func reset_run(mech: MechDef) -> void:
 	missile_ammo = 0
 	heat_sink_multiplier = 1.0
 	has_jump_jets = false
+	is_bonus_wave = false
 
 	var loadout := _resolve_loadout(mech)
 	for item_key in loadout.get("items", []):

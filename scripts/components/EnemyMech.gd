@@ -34,18 +34,24 @@ func setup(def: EnemyDef, diff_mult: float = 1.0) -> void:
 	_apply_visuals()
 
 func _apply_visuals() -> void:
-	var color := Color(1, 1, 1)
+	var tex_path: String
 	match enemy_def.archetype:
 		"scout":
-			color = Color(0.8, 0.8, 0.9)
+			tex_path = "res://assets/kenney_robot_pack/PNG/Top view/robot_blue.png"
 		"brawler":
-			color = Color(0.9, 0.3, 0.2)
+			tex_path = "res://assets/kenney_robot_pack/PNG/Top view/robot_red.png"
 		"artillery":
-			color = Color(0.6, 0.3, 0.9)
+			tex_path = "res://assets/kenney_robot_pack/PNG/Top view/robot_yellow.png"
 		"boss":
-			color = Color(0.5, 0.0, 0.0)
+			tex_path = "res://assets/kenney_robot_pack/PNG/Top view/robot_red.png"
 			scale = Vector2(2.5, 2.5)
-	$Sprite.color = color
+		_:
+			tex_path = "res://assets/kenney_robot_pack/PNG/Top view/robot_blue.png"
+	if ResourceLoader.exists(tex_path):
+		var tex: Texture2D = load(tex_path) as Texture2D
+		$Sprite.texture = tex
+		var s := 32.0 / maxf(tex.get_width(), tex.get_height())
+		$Sprite.scale = Vector2(s, s)
 
 func _physics_process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player")

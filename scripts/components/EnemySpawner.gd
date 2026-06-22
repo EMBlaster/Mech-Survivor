@@ -1,6 +1,8 @@
 extends Node2D
 
 signal boss_defeated
+signal bonus_wave_started(reward: int)
+signal bonus_wave_cleared(reward: int)
 
 const ENEMY_SCENE: PackedScene = preload("res://scenes/game/EnemyMech.tscn")
 const SPAWN_RADIUS: float = 800.0
@@ -17,6 +19,10 @@ const POST_BOSS_MIN_INTERVAL: float = 10.0
 const POST_BOSS_INTERVAL_DECAY: float = 0.85
 const POST_BOSS_WAVE_SIZE: int = 2
 
+const BONUS_WAVE_INTERVAL: float = 90.0
+const BONUS_WAVE_SIZE: int = 4
+const BONUS_WAVE_DIFFICULTY_BONUS: float = 1.5
+
 const ARCHETYPE_DEFS := {
 	"scout": preload("res://resources/enemies/locust_lct1v.tres"),
 	"brawler": preload("res://resources/enemies/centurion_cn9a.tres"),
@@ -32,6 +38,8 @@ var active_bosses: int = 0
 var post_boss_active: bool = false
 var post_boss_interval: float = POST_BOSS_INITIAL_INTERVAL
 var post_boss_timer: float = 0.0
+var bonus_wave_timer: float = BONUS_WAVE_INTERVAL
+var bonus_wave_alive: int = 0
 
 func setup(mission_def: MissionDef) -> void:
 	mission = mission_def
@@ -42,6 +50,8 @@ func setup(mission_def: MissionDef) -> void:
 	post_boss_active = false
 	post_boss_interval = POST_BOSS_INITIAL_INTERVAL
 	post_boss_timer = 0.0
+	bonus_wave_timer = BONUS_WAVE_INTERVAL
+	bonus_wave_alive = 0
 
 ## Called once the boss is defeated in an Assassination mission. Begins
 ## periodic escalating bonus waves (in addition to normal fill-to-cap) for
@@ -83,6 +93,12 @@ func _process(delta: float) -> void:
 			post_boss_interval = max(POST_BOSS_MIN_INTERVAL, post_boss_interval * POST_BOSS_INTERVAL_DECAY)
 			post_boss_timer = post_boss_interval
 
+	if not GameState.is_bonus_wave and active_bosses == 0 and not post_boss_active:
+		bonus_wave_timer -= delta
+		if bonus_wave_timer <= 0.0:
+			bonus_wave_timer = BONUS_WAVE_INTERVAL
+			_spawn_bonus_wave()
+
 func _spawn_post_boss_wave() -> void:
 	var scaling_steps: float = floor(elapsed_time / SCALING_INTERVAL)
 	var diff_mult: float = mission.base_difficulty * pow(SCALING_FACTOR, scaling_steps)
@@ -112,6 +128,35 @@ func _spawn_wave(wave: Dictionary) -> void:
 	var diff_mult: float = mission.base_difficulty * tier_mult * pow(SCALING_FACTOR, scaling_steps)
 	for i in count:
 		_spawn_enemy(def, diff_mult)
+
+func _spawn_bonus_wave() -> void:
+	if mission == null:
+		return
+	GameState.is_bonus_wave = true
+	bonus_wave_alive = BONUS_WAVE_SIZE
+	var scaling_steps := floor(elapsed_time / SCALING_INTERVAL)
+	var diff_mult := mission.base_difficulty * BONUS_WAVE_DIFFICULTY_BONUS * pow(SCALING_FACTOR, scaling_steps)
+	for i in BONUS_WAVE_SIZE:
+		var archetype: String = FILLER_ARCHETYPES[randi() % FILLER_ARCHETYPES.size()]
+		var def: EnemyDef = ARCHETYPE_DEFS.get(archetype)
+		var enemy := ENEMY_SCENE.instantiate()
+		var player := get_tree().get_first_node_in_group("player")
+		if player == null:
+			break
+		var angle := randf() * TAU
+		var spawn_pos := player.global_position + Vector2(cos(angle), sin(angle)) * SPAWN_RADIUS
+		get_parent().add_child(enemy)
+		enemy.global_position = spawn_pos
+		enemy.setup(def, diff_mult)
+		enemy.defeated.connect(_on_bonus_enemy_defeated)
+	bonus_wave_started.emit(mission.bonus_wave_reward)
+
+func _on_bonus_enemy_defeated(_def: EnemyDef) -> void:
+	bonus_wave_alive = max(0, bonus_wave_alive - 1)
+	if bonus_wave_alive == 0:
+		GameState.is_bonus_wave = false
+		GameState.add_run_credits(mission.bonus_wave_reward)
+		bonus_wave_cleared.emit(mission.bonus_wave_reward)
 
 func _spawn_enemy(def: EnemyDef, diff_mult: float) -> void:
 	var player := get_tree().get_first_node_in_group("player")

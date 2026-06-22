@@ -13,12 +13,7 @@ radius = 20.0
 motion_mode = 1
 script = ExtResource("1_b6cqs")
 
-[node name="Sprite" type="ColorRect" parent="." unique_id=326860299]
-offset_left = -18.0
-offset_top = -18.0
-offset_right = 18.0
-offset_bottom = 18.0
-mouse_filter = 2
+[node name="Sprite" type="Sprite2D" parent="." unique_id=326860299]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=74306359]
 shape = SubResource("CircleShape2D_kfmni")
