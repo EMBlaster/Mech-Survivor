@@ -8,12 +8,6 @@ const MECH_DEFS: Array[MechDef] = [
 	preload("res://resources/mechs/colossus_cls7d.tres"),
 ]
 
-const MISSION_DEFS: Array[MissionDef] = [
-	preload("res://resources/missions/mission1_recon_in_force.tres"),
-	preload("res://resources/missions/mission2_defensive_action.tres"),
-	preload("res://resources/missions/mission3_maximum_attrition.tres"),
-]
-
 var selected_mech: MechDef = null
 var selected_mission: MissionDef = null
 var mech_buttons: Array[Button] = []
@@ -34,7 +28,7 @@ func _ready() -> void:
 	$VBoxContainer/MechLabButton.pressed.connect(_on_mech_lab_pressed)
 	$VBoxContainer/BackButton.pressed.connect(_on_back_pressed)
 	selected_mech = MECH_DEFS[0]
-	selected_mission = MISSION_DEFS[0]
+	selected_mission = MissionBoard.available_missions[0]
 	_update_launch_state()
 
 func _build_mech_buttons() -> void:
@@ -82,15 +76,24 @@ func _on_mech_pressed(mech: MechDef, btn: Button) -> void:
 	_update_launch_state()
 
 func _build_mission_buttons() -> void:
-	for mission in MISSION_DEFS:
+	for mission in MissionBoard.available_missions:
 		var btn := Button.new()
 		btn.toggle_mode = true
 		btn.custom_minimum_size = Vector2(160, 60)
-		btn.text = "%s\n%ds  Reward: %d" % [mission.mission_name, int(mission.duration_seconds), mission.credit_reward]
+		btn.text = _mission_button_text(mission)
 		btn.pressed.connect(_on_mission_pressed.bind(mission, btn))
 		$VBoxContainer/MissionList.add_child(btn)
 		mission_buttons.append(btn)
 	mission_buttons[0].button_pressed = true
+
+func _mission_button_text(mission: MissionDef) -> String:
+	var contract_tag := "  [CONTRACT]" if not mission.sponsored_by_corp.is_empty() else ""
+	return "%s\n%ds  Reward: %d%s" % [
+		mission.mission_name,
+		int(mission.duration_seconds),
+		mission.credit_reward,
+		contract_tag,
+	]
 
 func _on_mission_pressed(mission: MissionDef, btn: Button) -> void:
 	for b in mission_buttons:

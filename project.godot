@@ -23,6 +23,7 @@ SaveManager="*res://scripts/autoloads/SaveManager.gd"
 ItemDatabase="*res://scripts/autoloads/ItemDatabase.gd"
 SalvageSystem="*res://scripts/autoloads/SalvageSystem.gd"
 CraftingSystem="*res://scripts/autoloads/CraftingSystem.gd"
+MissionBoard="*res://scripts/autoloads/MissionBoard.gd"
 
 [physics]
 

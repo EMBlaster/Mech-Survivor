@@ -45,4 +45,5 @@ func _on_retry_pressed() -> void:
 
 func _on_menu_pressed() -> void:
 	get_tree().paused = false
+	MissionBoard.refresh()
 	get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")
