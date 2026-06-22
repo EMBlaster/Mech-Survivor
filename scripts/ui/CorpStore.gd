@@ -57,6 +57,37 @@ func _brand(base: WeaponDef) -> WeaponDef:
 	w.traits = _corp.trait_pool.duplicate()
 	return w
 
+func _weapon_tooltip(w: WeaponDef) -> String:
+	if w == null:
+		return ""
+	var header := w.weapon_name
+	if not w.manufacturer.is_empty() and w.manufacturer != "Standard":
+		header += "  —  %s" % w.manufacturer
+	var lines: Array[String] = [
+		header,
+		"%s  ·  %.1ft" % [w.weapon_type.capitalize(), w.weight],
+		"DMG %.0f   RNG %.0f   Heat %.1f/s   CD %.2fs" % [
+			w.damage, w.fire_range, w.heat, w.get_cooldown()],
+	]
+	if not w.ammo_type.is_empty():
+		lines.append("Uses: %d %s ammo/shot" % [w.ammo_per_shot, w.ammo_type])
+	if w.aoe_radius > 0.0:
+		lines.append("AoE: %.0f radius" % w.aoe_radius)
+	if not w.traits.is_empty():
+		var trait_labels: Array[String] = []
+		for t in w.traits:
+			trait_labels.append(TraitResolver.label(t))
+		lines.append("")
+		lines.append("Traits:  %s" % "  |  ".join(trait_labels))
+		var eff := TraitResolver.get_effective_stats(w)
+		lines.append("Effective:  DMG %.0f   RNG %.0f   Heat %.1f/s   Wt %.1ft" % [
+			eff.get("damage", w.damage),
+			eff.get("fire_range", w.fire_range),
+			eff.get("heat", w.heat),
+			eff.get("weight", w.weight),
+		])
+	return "\n".join(lines)
+
 static func _tier_color(tier: int) -> Color:
 	match tier:
 		1: return Color(1.0, 1.0, 1.0)
@@ -127,6 +158,8 @@ func _build_weapon_row(weapon: WeaponDef) -> Control:
 	var name_lbl := Label.new()
 	name_lbl.text = "%s  —  %s" % [weapon.weapon_name, _corp.corp_name]
 	name_lbl.add_theme_color_override("font_color", _tier_color(weapon.tier))
+	name_lbl.tooltip_text = _weapon_tooltip(weapon)
+	name_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	info.add_child(name_lbl)
 
 	if not weapon.traits.is_empty():

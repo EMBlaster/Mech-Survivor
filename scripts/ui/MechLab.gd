@@ -831,24 +831,37 @@ func _weapon_trait_summary(w: WeaponDef) -> String:
 		labels.append(TraitResolver.label(t))
 	return "  [%s]" % " | ".join(labels)
 
-## Multi-line tooltip showing effective stats and all traits for a weapon.
-## Returns "" for null weapons or weapons with no traits.
+## Multi-line tooltip for any weapon. Shows base stats always; appends
+## trait list and effective (post-trait) stats when traits are present.
 func _weapon_trait_tooltip(w: WeaponDef) -> String:
-	if w == null or w.traits.is_empty():
+	if w == null:
 		return ""
-	var eff := TraitResolver.get_effective_stats(w)
+	var header := w.weapon_name
+	if not w.manufacturer.is_empty() and w.manufacturer != "Standard":
+		header += "  —  %s" % w.manufacturer
 	var lines: Array[String] = [
-		"%s T%d — %s" % [w.weapon_name, w.tier, w.manufacturer if not w.manufacturer.is_empty() else "Salvage"],
-		"Effective: DMG %.0f  RNG %.0f  Heat %.1f  Wt %.1f" % [
+		header,
+		"%s  ·  %.1ft" % [w.weapon_type.capitalize(), w.weight],
+		"DMG %.0f   RNG %.0f   Heat %.1f/s   CD %.2fs" % [
+			w.damage, w.fire_range, w.heat, w.get_cooldown()],
+	]
+	if not w.ammo_type.is_empty():
+		lines.append("Uses: %d %s ammo/shot" % [w.ammo_per_shot, w.ammo_type])
+	if w.aoe_radius > 0.0:
+		lines.append("AoE: %.0f radius" % w.aoe_radius)
+	if not w.traits.is_empty():
+		var trait_labels: Array[String] = []
+		for t in w.traits:
+			trait_labels.append(TraitResolver.label(t))
+		lines.append("")
+		lines.append("Traits:  %s" % "  |  ".join(trait_labels))
+		var eff := TraitResolver.get_effective_stats(w)
+		lines.append("Effective:  DMG %.0f   RNG %.0f   Heat %.1f/s   Wt %.1ft" % [
 			eff.get("damage", w.damage),
 			eff.get("fire_range", w.fire_range),
 			eff.get("heat", w.heat),
 			eff.get("weight", w.weight),
-		],
-		"Traits:",
-	]
-	for t in w.traits:
-		lines.append("  • %s" % TraitResolver.label(t))
+		])
 	return "\n".join(lines)
 
 func _on_craft_confirm_pressed() -> void:
