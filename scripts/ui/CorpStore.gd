@@ -57,6 +57,14 @@ func _brand(base: WeaponDef) -> WeaponDef:
 	w.traits = _corp.trait_pool.duplicate()
 	return w
 
+static func _tier_color(tier: int) -> Color:
+	match tier:
+		1: return Color(1.0, 1.0, 1.0)
+		2: return Color(0.3, 0.9, 0.3)
+		3: return Color(0.4, 0.6, 1.0)
+		4: return Color(0.8, 0.4, 1.0)
+		_: return Color(1.0, 0.85, 0.2)
+
 func _weapon_price(weapon: WeaponDef) -> int:
 	var base := BASE_PRICE_T1 if weapon.tier == 1 else BASE_PRICE_T2
 	return int(float(base) * _corp.price_multiplier)
@@ -116,9 +124,9 @@ func _build_weapon_row(weapon: WeaponDef) -> Control:
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(info)
 
-	var tier_tag := " [T2]" if weapon.tier == 2 else ""
 	var name_lbl := Label.new()
-	name_lbl.text = "%s%s  —  %s" % [weapon.weapon_name, tier_tag, _corp.corp_name]
+	name_lbl.text = "%s  —  %s" % [weapon.weapon_name, _corp.corp_name]
+	name_lbl.add_theme_color_override("font_color", _tier_color(weapon.tier))
 	info.add_child(name_lbl)
 
 	if not weapon.traits.is_empty():

@@ -295,10 +295,14 @@ func _update_slots() -> void:
 			btn.text = ""
 			btn.modulate = Color(1, 1, 1, 0.4)
 			btn.tooltip_text = ""
+			btn.remove_theme_color_override("font_color")
 		else:
 			btn.text = _slot_display_text(item_key)
 			btn.modulate = Color(1, 1, 1, 1)
 			btn.tooltip_text = _weapon_trait_tooltip(ItemDatabase.get_weapon(item_key))
+			var slot_tier := _slot_item_tier(item_key)
+			if slot_tier > 0:
+				btn.add_theme_color_override("font_color", _tier_color(slot_tier))
 
 func _slot_display_text(key: String) -> String:
 	var w := ItemDatabase.get_weapon(key)
@@ -308,14 +312,23 @@ func _slot_display_text(key: String) -> String:
 			suffix = " [B]"
 		elif w.ammo_type == "missile":
 			suffix = " [M]"
-		return "%s T%d%s" % [w.weapon_name, w.tier, suffix]
+		return "%s%s" % [w.weapon_name, suffix]
 	var e := ItemDatabase.get_equipment(key)
 	if e != null:
-		return "%s T%d" % [e.equipment_name, e.tier]
+		return e.equipment_name
 	var bin := ItemDatabase.get_ammo_bin(key)
 	if bin != null:
 		return "%s Bin" % bin.ammo_type.capitalize()
 	return key
+
+func _slot_item_tier(key: String) -> int:
+	var w := ItemDatabase.get_weapon(key)
+	if w != null:
+		return w.tier
+	var e := ItemDatabase.get_equipment(key)
+	if e != null:
+		return e.tier
+	return 0
 
 ## --- Inventory ---
 
@@ -361,13 +374,13 @@ func _rebuild_inventory() -> void:
 				continue
 			var eff := TraitResolver.get_effective_stats(w)
 			var trait_tag := _weapon_trait_summary(w)
-			var label := "x%d  %s  T%d  [%.1ft]  DMG %.0f  RNG %.0f%s" % [
-				available, w.weapon_name, w.tier,
+			var label := "x%d  %s  [%.1ft]  DMG %.0f  RNG %.0f%s" % [
+				available, w.weapon_name,
 				eff.get("weight", w.weight),
 				eff.get("damage", w.damage),
 				eff.get("fire_range", w.fire_range),
 				trait_tag]
-			_add_inventory_row(key, label, available > 0, _weapon_trait_tooltip(w))
+			_add_inventory_row(key, label, available > 0, _weapon_trait_tooltip(w), w.tier)
 
 	if inventory_filter in ["ALL", "Equipment"]:
 		for e in ItemDatabase.get_all_equipment():
@@ -378,8 +391,8 @@ func _rebuild_inventory() -> void:
 			var available: int = owned - _placed_count(key)
 			if valid_only and (available <= 0 or current_weight + e.weight > current_mech.free_tonnage or empty_slots <= 0):
 				continue
-			var label := "x%d  %s  T%d  [%.1ft]" % [available, e.equipment_name, e.tier, e.weight]
-			_add_inventory_row(key, label, available > 0)
+			var label := "x%d  %s  [%.1ft]" % [available, e.equipment_name, e.weight]
+			_add_inventory_row(key, label, available > 0, "", e.tier)
 
 	if inventory_filter in ["ALL", "Ammo Bins"]:
 		for bin in ItemDatabase.get_all_ammo_bins():
@@ -394,13 +407,15 @@ func _rebuild_inventory() -> void:
 				[available, bin.ammo_type.capitalize(), bin.weight, bin.ammo_provided]
 			_add_inventory_row(key, label, available > 0)
 
-func _add_inventory_row(key: String, label: String, can_place: bool, tooltip: String = "") -> void:
+func _add_inventory_row(key: String, label: String, can_place: bool, tooltip: String = "", tier: int = 0) -> void:
 	var btn := Button.new()
 	btn.text = label
 	btn.toggle_mode = true
 	btn.button_pressed = (placement_item_key == key)
 	btn.disabled = not can_place and placement_item_key != key
 	btn.tooltip_text = tooltip
+	if tier > 0:
+		btn.add_theme_color_override("font_color", _tier_color(tier))
 	btn.pressed.connect(_on_inventory_item_pressed.bind(key))
 	$MainVBox/ContentHBox/LeftPanel/InventoryScroll/InventoryList.add_child(btn)
 
@@ -725,8 +740,9 @@ func _rebuild_crafting_groups() -> void:
 		var w: WeaponDef = group["weapon"]
 		var btn := Button.new()
 		btn.toggle_mode = true
-		btn.text = "x%d  %s  T%d -> T%d" % [group["qty"], w.weapon_name, w.tier, w.tier + 1]
+		btn.text = "x%d  %s  → T%d" % [group["qty"], w.weapon_name, w.tier + 1]
 		btn.button_pressed = (not crafting_group.is_empty() and crafting_group["weapon"] == w)
+		btn.add_theme_color_override("font_color", _tier_color(w.tier))
 		btn.pressed.connect(_on_crafting_group_pressed.bind(group))
 		list.add_child(btn)
 		crafting_group_buttons.append(btn)
@@ -796,6 +812,14 @@ func _on_trait_toggled(pressed: bool, trait_id: String) -> void:
 	else:
 		crafting_bonuses.erase(trait_id)
 	_update_crafting_preview()
+
+static func _tier_color(tier: int) -> Color:
+	match tier:
+		1: return Color(1.0, 1.0, 1.0)
+		2: return Color(0.3, 0.9, 0.3)
+		3: return Color(0.4, 0.6, 1.0)
+		4: return Color(0.8, 0.4, 1.0)
+		_: return Color(1.0, 0.85, 0.2)
 
 ## One-line trait summary for inventory rows, e.g. "  [+15% dmg | -10% rng]".
 ## Returns "" when the weapon has no traits.
