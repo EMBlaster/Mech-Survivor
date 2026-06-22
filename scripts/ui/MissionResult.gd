@@ -9,6 +9,8 @@ func _ready() -> void:
 	GameState.mission_extract_failed.connect(_on_mission_extract_failed)
 	$CenterContainer/Panel/VBoxContainer/RetryButton.pressed.connect(_on_retry_pressed)
 	$CenterContainer/Panel/VBoxContainer/MenuButton.pressed.connect(_on_menu_pressed)
+	$CenterContainer/Panel/VBoxContainer/RetryButton.text = "Retry [R]"
+	$CenterContainer/Panel/VBoxContainer/MenuButton.text = "Menu [Esc]"
 
 func _on_mission_complete(credits_earned: int) -> void:
 	_apply_mission_rep(true)
@@ -46,6 +48,14 @@ func _show_result(title: String, credits_earned: int) -> void:
 		SaveManager.add_credits(credits_earned)
 	get_tree().paused = true
 	visible = true
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event.is_action_pressed("menu_retry"):
+		_on_retry_pressed()
+	elif event.is_action_pressed("menu_back"):
+		_on_menu_pressed()
 
 func _on_retry_pressed() -> void:
 	get_tree().paused = false

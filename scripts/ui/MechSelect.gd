@@ -27,6 +27,9 @@ func _ready() -> void:
 	$VBoxContainer/LaunchButton.pressed.connect(_on_launch_pressed)
 	$VBoxContainer/MechLabButton.pressed.connect(_on_mech_lab_pressed)
 	$VBoxContainer/BackButton.pressed.connect(_on_back_pressed)
+	$VBoxContainer/LaunchButton.text = "Launch Mission [L]"
+	$VBoxContainer/MechLabButton.text = "Mech Lab [M]"
+	$VBoxContainer/BackButton.text = "Back [Esc]"
 	_add_corp_store_button()
 	selected_mech = MECH_DEFS[0]
 	selected_mission = MissionBoard.available_missions[0]
@@ -113,11 +116,23 @@ func _on_mech_lab_pressed() -> void:
 	GameState.current_mech = selected_mech
 	get_tree().change_scene_to_file("res://scenes/ui/MechLab.tscn")
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_launch"):
+		if not $VBoxContainer/LaunchButton.disabled:
+			_on_launch_pressed()
+	elif event.is_action_pressed("menu_mech_lab"):
+		_on_mech_lab_pressed()
+	elif event.is_action_pressed("menu_corp_store"):
+		if not SaveManager.corp_store_access.is_empty():
+			_on_corp_store_pressed()
+	elif event.is_action_pressed("menu_back"):
+		_on_back_pressed()
+
 func _add_corp_store_button() -> void:
 	if SaveManager.corp_store_access.is_empty():
 		return
 	var btn := Button.new()
-	btn.text = "Corp Store\n[%s]" % SaveManager.corp_store_access
+	btn.text = "Corp Store [C]\n[%s]" % SaveManager.corp_store_access
 	btn.pressed.connect(_on_corp_store_pressed)
 	$VBoxContainer.add_child(btn)
 	$VBoxContainer.move_child(btn, $VBoxContainer/BackButton.get_index())

@@ -139,37 +139,37 @@ func _build_bottom_bar() -> void:
 
 	var save_btn := Button.new()
 	save_btn.name = "SaveButton"
-	save_btn.text = "SAVE LOADOUT"
+	save_btn.text = "SAVE [S]"
 	save_btn.pressed.connect(_on_save_pressed)
 	bar.add_child(save_btn)
 
 	var revert_btn := Button.new()
-	revert_btn.text = "LOAD LOADOUT"
+	revert_btn.text = "LOAD [L]"
 	revert_btn.pressed.connect(_on_revert_pressed)
 	bar.add_child(revert_btn)
 
 	var default_btn := Button.new()
-	default_btn.text = "DEFAULT LOADOUT"
+	default_btn.text = "DEFAULT [D]"
 	default_btn.pressed.connect(_on_default_pressed)
 	bar.add_child(default_btn)
 
 	var strip_mech_btn := Button.new()
-	strip_mech_btn.text = "STRIP MECH"
+	strip_mech_btn.text = "STRIP [X]"
 	strip_mech_btn.pressed.connect(_on_strip_mech_pressed)
 	bar.add_child(strip_mech_btn)
 
 	var max_armor_btn := Button.new()
-	max_armor_btn.text = "MAX ARMOR"
+	max_armor_btn.text = "MAX ARMOR [A]"
 	max_armor_btn.pressed.connect(_on_max_armor_pressed)
 	bar.add_child(max_armor_btn)
 
 	var strip_armor_btn := Button.new()
-	strip_armor_btn.text = "STRIP ARMOR"
+	strip_armor_btn.text = "STRIP ARMOR [Z]"
 	strip_armor_btn.pressed.connect(_on_strip_armor_pressed)
 	bar.add_child(strip_armor_btn)
 
 	var crafting_btn := Button.new()
-	crafting_btn.text = "CRAFTING"
+	crafting_btn.text = "CRAFTING [C]"
 	crafting_btn.pressed.connect(_on_crafting_button_pressed)
 	bar.add_child(crafting_btn)
 
@@ -178,7 +178,7 @@ func _build_bottom_bar() -> void:
 	bar.add_child(spacer)
 
 	var back_btn := Button.new()
-	back_btn.text = "BACK"
+	back_btn.text = "BACK [Esc]"
 	back_btn.pressed.connect(_on_back_pressed)
 	bar.add_child(back_btn)
 
@@ -523,7 +523,7 @@ func _update_stats() -> void:
 	var over_budget := total_weight > budget
 	var save_btn: Button = $MainVBox/BottomBar/SaveButton
 	save_btn.disabled = over_budget
-	save_btn.text = "SAVE LOADOUT (OVER BUDGET)" if over_budget else "SAVE LOADOUT"
+	save_btn.text = "SAVE [S] (OVER BUDGET)" if over_budget else "SAVE [S]"
 
 func _update_armor_label() -> void:
 	var cur: float = working_loadout["armor"]
@@ -592,6 +592,27 @@ func _on_max_armor_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/MechSelect.tscn")
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_back"):
+		if $CraftingOverlay.visible:
+			_on_crafting_close_pressed()
+		else:
+			_on_back_pressed()
+	elif event.is_action_pressed("menu_crafting"):
+		_on_crafting_button_pressed()
+	elif event.is_action_pressed("menu_save"):
+		_on_save_pressed()
+	elif event.is_action_pressed("menu_load"):
+		_on_revert_pressed()
+	elif event.is_action_pressed("menu_default_loadout"):
+		_on_default_pressed()
+	elif event.is_action_pressed("menu_strip_mech"):
+		_on_strip_mech_pressed()
+	elif event.is_action_pressed("menu_max_armor"):
+		_on_max_armor_pressed()
+	elif event.is_action_pressed("menu_strip_armor"):
+		_on_strip_armor_pressed()
 
 ## --- Crafting sub-panel (spec 7.2) ---
 

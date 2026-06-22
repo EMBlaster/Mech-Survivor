@@ -104,7 +104,7 @@ func _build_ui() -> void:
 	root.add_child(HSeparator.new())
 
 	var leave_btn := Button.new()
-	leave_btn.text = "Leave Store"
+	leave_btn.text = "Leave Store [Esc]"
 	leave_btn.pressed.connect(_on_leave_pressed)
 	root.add_child(leave_btn)
 
@@ -188,6 +188,10 @@ func _refresh_buy_buttons() -> void:
 			continue
 		var entry: Dictionary = _buy_buttons[wkey]
 		entry.btn.disabled = SaveManager.credits < entry.price
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_back"):
+		_on_leave_pressed()
 
 func _on_leave_pressed() -> void:
 	SaveManager.corp_store_access = ""
