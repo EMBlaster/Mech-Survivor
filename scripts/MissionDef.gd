@@ -27,3 +27,7 @@ class_name MissionDef extends Resource
 	"ballistic_ammo": 0.08,
 	"missile_ammo": 0.08,
 }
+
+## Corp that sponsored this mission. Empty = generic (no rep consequences).
+## Success: +10 rep with this corp. Failure: -20 rep.
+@export var sponsored_by_corp: String = ""

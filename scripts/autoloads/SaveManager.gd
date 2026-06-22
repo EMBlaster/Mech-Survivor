@@ -17,6 +17,19 @@ var mech_loadouts: Dictionary = {}
 ## Same shape as a mech_loadouts entry.
 var active_loadout: Dictionary = {}
 
+## Corporate reputation: corp_name -> int in [-100, 100]. Starts at 0.
+## Breaking relationships is fast, rebuilding is slow or impossible.
+var corp_reputation: Dictionary = {}
+
+signal rep_changed(corp: String, new_val: int)
+
+## Corp goes dark (stops appearing on the mission board) at or below this value.
+const REP_DARK_THRESHOLD: int = -50
+## Corp T2 store unlocks at or above this value.
+const REP_T2_STORE_THRESHOLD: int = 40
+const REP_CLAMP_MIN: int = -100
+const REP_CLAMP_MAX: int = 100
+
 func _ready() -> void:
 	load_save()
 
@@ -29,6 +42,7 @@ func save() -> void:
 	config.set_value("inventory", "owned_ammo_bins", owned_ammo_bins)
 	config.set_value("loadouts", "mech_loadouts", mech_loadouts)
 	config.set_value("loadouts", "active_loadout", active_loadout)
+	config.set_value("reputation", "corp_reputation", corp_reputation)
 	config.save(SAVE_PATH)
 
 func load_save() -> void:
@@ -43,6 +57,7 @@ func load_save() -> void:
 	owned_ammo_bins = config.get_value("inventory", "owned_ammo_bins", {})
 	mech_loadouts = config.get_value("loadouts", "mech_loadouts", {})
 	active_loadout = config.get_value("loadouts", "active_loadout", {})
+	corp_reputation = config.get_value("reputation", "corp_reputation", {})
 	_discard_old_format_loadouts()
 
 ## Old saves stored loadouts as { "locations": {...}, "armor": {...} } (per
@@ -132,3 +147,31 @@ func save_loadout(mech: MechDef, loadout: Dictionary) -> void:
 func set_active_loadout(loadout: Dictionary) -> void:
 	active_loadout = loadout
 	save()
+
+## --- Reputation ---
+
+func get_rep(corp: String) -> int:
+	return corp_reputation.get(corp, 0)
+
+## Adjusts reputation for a corp by delta, clamped to [REP_CLAMP_MIN, REP_CLAMP_MAX].
+## Persists immediately and emits rep_changed if the value actually changed.
+## Typical deltas: +10 (mission success), -20 (mission failure).
+func modify_rep(corp: String, delta: int) -> void:
+	if corp.is_empty():
+		return
+	var old_val: int = get_rep(corp)
+	var new_val: int = clampi(old_val + delta, REP_CLAMP_MIN, REP_CLAMP_MAX)
+	if new_val == old_val:
+		return
+	corp_reputation[corp] = new_val
+	save()
+	rep_changed.emit(corp, new_val)
+
+## Returns true when a corp's rep has fallen to or below REP_DARK_THRESHOLD.
+## Dark corps are excluded from the mission board draw pool entirely.
+func is_corp_dark(corp: String) -> bool:
+	return get_rep(corp) <= REP_DARK_THRESHOLD
+
+## Returns true when a corp's rep is high enough to unlock their T2 store.
+func t2_store_unlocked(corp: String) -> bool:
+	return get_rep(corp) >= REP_T2_STORE_THRESHOLD

@@ -11,13 +11,24 @@ func _ready() -> void:
 	$CenterContainer/Panel/VBoxContainer/MenuButton.pressed.connect(_on_menu_pressed)
 
 func _on_mission_complete(credits_earned: int) -> void:
+	_apply_mission_rep(true)
 	_show_result("MISSION COMPLETE", credits_earned)
 
 func _on_player_died(credits_earned: int) -> void:
+	_apply_mission_rep(false)
 	_show_result("MECH DESTROYED", credits_earned)
 
 func _on_mission_extract_failed() -> void:
+	_apply_mission_rep(false)
 	_show_result("EXTRACTED EARLY - NO REWARD", 0)
+
+## Applies rep change for corp-sponsored missions. Success: +10, failure: -20.
+func _apply_mission_rep(success: bool) -> void:
+	var mission := GameState.current_mission
+	if mission == null or mission.sponsored_by_corp.is_empty():
+		return
+	var delta := 10 if success else -20
+	SaveManager.modify_rep(mission.sponsored_by_corp, delta)
 
 func _show_result(title: String, credits_earned: int) -> void:
 	$CenterContainer/Panel/VBoxContainer/TitleLabel.text = title
