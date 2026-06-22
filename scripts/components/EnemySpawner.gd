@@ -144,7 +144,7 @@ func _spawn_bonus_wave() -> void:
 		if player == null:
 			break
 		var angle := randf() * TAU
-		var spawn_pos := player.global_position + Vector2(cos(angle), sin(angle)) * SPAWN_RADIUS
+		var spawn_pos: Vector2 = player.global_position + Vector2(cos(angle), sin(angle)) * SPAWN_RADIUS
 		get_parent().add_child(enemy)
 		enemy.global_position = spawn_pos
 		enemy.setup(def, diff_mult)
