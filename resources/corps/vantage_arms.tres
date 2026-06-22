@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Vantage Arms"
+symbol = "◎"
 philosophy = "Precision craftsmanship. Every shot placed, not sprayed."
 trait_pool = Array[String](["range_bonus", "velocity_bonus"])
 availability = 0.8

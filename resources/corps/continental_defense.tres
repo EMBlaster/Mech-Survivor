@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Continental Defense"
+symbol = "■"
 philosophy = "Standard issue. Everywhere, always, no surprises."
 trait_pool = Array[String]([])
 availability = 1.5

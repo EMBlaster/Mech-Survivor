@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Helix Energy Systems"
+symbol = "⚡"
 philosophy = "Thermal efficiency is the edge. Waste nothing."
 trait_pool = Array[String](["cooldown_reduction", "range_bonus"])
 availability = 0.7

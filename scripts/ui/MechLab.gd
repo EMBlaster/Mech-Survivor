@@ -312,7 +312,7 @@ func _slot_display_text(key: String) -> String:
 			suffix = " [B]"
 		elif w.ammo_type == "missile":
 			suffix = " [M]"
-		return "%s%s" % [w.weapon_name, suffix]
+		return "%s%s%s" % [_corp_symbol(w.manufacturer), w.weapon_name, suffix]
 	var e := ItemDatabase.get_equipment(key)
 	if e != null:
 		return e.equipment_name
@@ -374,8 +374,8 @@ func _rebuild_inventory() -> void:
 				continue
 			var eff := TraitResolver.get_effective_stats(w)
 			var trait_tag := _weapon_trait_summary(w)
-			var label := "x%d  %s  [%.1ft]  DMG %.0f  RNG %.0f%s" % [
-				available, w.weapon_name,
+			var label := "x%d  %s%s  [%.1ft]  DMG %.0f  RNG %.0f%s" % [
+				available, _corp_symbol(w.manufacturer), w.weapon_name,
 				eff.get("weight", w.weight),
 				eff.get("damage", w.damage),
 				eff.get("fire_range", w.fire_range),
@@ -812,6 +812,14 @@ func _on_trait_toggled(pressed: bool, trait_id: String) -> void:
 	else:
 		crafting_bonuses.erase(trait_id)
 	_update_crafting_preview()
+
+func _corp_symbol(manufacturer: String) -> String:
+	if manufacturer.is_empty() or manufacturer == "Standard":
+		return ""
+	for corp in MissionBoard.CORPS:
+		if corp.corp_name == manufacturer:
+			return corp.symbol + " " if not corp.symbol.is_empty() else ""
+	return ""
 
 static func _tier_color(tier: int) -> Color:
 	match tier:

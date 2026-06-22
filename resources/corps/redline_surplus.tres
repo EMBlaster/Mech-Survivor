@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Redline Surplus"
+symbol = "◆"
 philosophy = "Questionable provenance. Unquestionable availability."
 trait_pool = Array[String](["weight_reduction", "cooldown_reduction"])
 availability = 1.3

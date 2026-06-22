@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Ironforge Munitions"
+symbol = "⚒"
 philosophy = "Built to last. Hits like it means it."
 trait_pool = Array[String](["damage_bonus", "weight_penalty"])
 availability = 1.0

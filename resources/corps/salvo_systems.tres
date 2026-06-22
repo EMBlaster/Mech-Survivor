@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Salvo Systems"
+symbol = "⊕"
 philosophy = "Maximum ordnance. Minimum regret."
 trait_pool = Array[String](["damage_bonus", "splash_bonus"])
 availability = 0.8

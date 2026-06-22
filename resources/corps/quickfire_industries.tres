@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Quickfire Industries"
+symbol = "▶"
 philosophy = "More shots downrange. Weight is the enemy."
 trait_pool = Array[String](["cooldown_reduction", "weight_reduction", "damage_penalty"])
 availability = 1.2

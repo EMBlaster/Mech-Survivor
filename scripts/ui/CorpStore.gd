@@ -113,7 +113,7 @@ func _build_ui() -> void:
 	add_child(root)
 
 	var title := Label.new()
-	title.text = "CORP STORE — %s" % _corp.corp_name
+	title.text = "CORP STORE — %s %s" % [_corp.symbol, _corp.corp_name]
 	root.add_child(title)
 
 	var rep_lbl := Label.new()
@@ -156,7 +156,7 @@ func _build_weapon_row(weapon: WeaponDef) -> Control:
 	row.add_child(info)
 
 	var name_lbl := Label.new()
-	name_lbl.text = "%s  —  %s" % [weapon.weapon_name, _corp.corp_name]
+	name_lbl.text = "%s %s  —  %s" % [_corp.symbol, weapon.weapon_name, _corp.corp_name]
 	name_lbl.add_theme_color_override("font_color", _tier_color(weapon.tier))
 	name_lbl.tooltip_text = _weapon_tooltip(weapon)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_STOP

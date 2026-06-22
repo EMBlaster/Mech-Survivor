@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_script")
 corp_name = "Axiom Dynamics"
+symbol = "△"
 philosophy = "Prototype performance. Production never guaranteed."
 trait_pool = Array[String](["damage_bonus", "range_bonus", "cooldown_penalty", "damage_penalty"])
 availability = 0.4

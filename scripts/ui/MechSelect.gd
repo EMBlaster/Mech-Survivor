@@ -91,8 +91,16 @@ func _build_mission_buttons() -> void:
 	mission_buttons[0].button_pressed = true
 
 func _mission_button_text(mission: MissionDef) -> String:
+	var prefix := ""
+	if not mission.sponsored_by_corp.is_empty():
+		for corp in MissionBoard.CORPS:
+			if corp.corp_name == mission.sponsored_by_corp:
+				if not corp.symbol.is_empty():
+					prefix = corp.symbol + " "
+				break
 	var contract_tag := "  [CONTRACT]" if not mission.sponsored_by_corp.is_empty() else ""
-	return "%s\n%ds  Reward: %d%s" % [
+	return "%s%s\n%ds  Reward: %d%s" % [
+		prefix,
 		mission.mission_name,
 		int(mission.duration_seconds),
 		mission.credit_reward,
