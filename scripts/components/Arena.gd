@@ -1,7 +1,7 @@
 extends Node2D
 
 const PLAYER_SCENE: PackedScene = preload("res://scenes/game/PlayerMech.tscn")
-const DEFAULT_MECH: MechDef = preload("res://resources/mechs/jenner_jr7d.tres")
+const DEFAULT_MECH: MechDef = preload("res://resources/mechs/jackal_jkl1a.tres")
 const DEFAULT_MISSION: MissionDef = preload("res://resources/missions/mission1_recon_in_force.tres")
 
 const ZOOM_STEP: float = 0.1

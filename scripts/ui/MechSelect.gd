@@ -1,11 +1,11 @@
 extends Control
 
 const MECH_DEFS: Array[MechDef] = [
-	preload("res://resources/mechs/jenner_jr7d.tres"),
-	preload("res://resources/mechs/hunchback_hbk4g.tres"),
-	preload("res://resources/mechs/catapult_cplt_c1.tres"),
-	preload("res://resources/mechs/warhammer_whm6r.tres"),
-	preload("res://resources/mechs/atlas_as7d.tres"),
+	preload("res://resources/mechs/jackal_jkl1a.tres"),
+	preload("res://resources/mechs/rampart_rmp4g.tres"),
+	preload("res://resources/mechs/ballista_bls_c1.tres"),
+	preload("res://resources/mechs/anvil_anv6r.tres"),
+	preload("res://resources/mechs/colossus_cls7d.tres"),
 ]
 
 const MISSION_DEFS: Array[MissionDef] = [

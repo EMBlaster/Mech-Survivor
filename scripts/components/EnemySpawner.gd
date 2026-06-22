@@ -24,10 +24,10 @@ const BONUS_WAVE_SIZE: int = 4
 const BONUS_WAVE_DIFFICULTY_BONUS: float = 1.5
 
 const ARCHETYPE_DEFS := {
-	"scout": preload("res://resources/enemies/locust_lct1v.tres"),
-	"brawler": preload("res://resources/enemies/centurion_cn9a.tres"),
-	"artillery": preload("res://resources/enemies/catapult_cplt_c1_enemy.tres"),
-	"boss": preload("res://resources/enemies/atlas_as7d_enemy.tres"),
+	"scout": preload("res://resources/enemies/harrier_hrr1v.tres"),
+	"brawler": preload("res://resources/enemies/sentinel_snt9a.tres"),
+	"artillery": preload("res://resources/enemies/ballista_bls_c1_enemy.tres"),
+	"boss": preload("res://resources/enemies/colossus_cls7d_enemy.tres"),
 }
 
 var mission: MissionDef = null

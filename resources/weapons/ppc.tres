@@ -5,10 +5,10 @@
 
 [resource]
 script = ExtResource("1_script")
-weapon_name = "PPC"
+weapon_name = "Particle Cannon"
 weapon_type = "laser"
 damage = 28.0
-range = 500.0
+fire_range = 500.0
 heat = 10.0
 projectile_speed = 700.0
 projectile_scene = ExtResource("2_proj")

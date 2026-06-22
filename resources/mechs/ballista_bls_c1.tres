@@ -7,7 +7,7 @@
 
 [resource]
 script = ExtResource("1_script")
-mech_name = "Catapult CPLT-C1"
+mech_name = "Ballista BLS-C1"
 weight_class = "Medium"
 max_speed = 65.0
 max_armor = 120.0

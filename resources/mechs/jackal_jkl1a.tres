@@ -7,7 +7,7 @@
 
 [resource]
 script = ExtResource("1_script")
-mech_name = "Jenner JR7-D"
+mech_name = "Jackal JKL-1A"
 weight_class = "Light"
 max_speed = 110.0
 max_armor = 60.0

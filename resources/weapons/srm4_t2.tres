@@ -5,12 +5,12 @@
 
 [resource]
 script = ExtResource("1_script")
-weapon_name = "SRM 4"
+weapon_name = "SRM-4"
 weapon_type = "missile"
 manufacturer = "Standard"
 tier = 2
 damage = 22.0
-range = 260.0
+fire_range = 260.0
 heat = 2.0
 projectile_speed = 350.0
 aoe_radius = 45.0

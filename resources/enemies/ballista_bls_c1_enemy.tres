@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_script")
-enemy_name = "Catapult CPLT-C1"
+enemy_name = "Ballista BLS-C1"
 archetype = "artillery"
 base_armor = 60.0
 base_speed = 40.0

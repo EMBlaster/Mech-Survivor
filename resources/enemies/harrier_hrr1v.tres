@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_script")
-enemy_name = "Locust LCT-1V"
+enemy_name = "Harrier HRR-1V"
 archetype = "scout"
 base_armor = 20.0
 base_speed = 120.0

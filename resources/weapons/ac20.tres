@@ -5,10 +5,10 @@
 
 [resource]
 script = ExtResource("1_script")
-weapon_name = "AC/20"
+weapon_name = "Autocannon-20"
 weapon_type = "autocannon"
 damage = 35.0
-range = 200.0
+fire_range = 200.0
 heat = 7.0
 projectile_speed = 500.0
 projectile_scene = ExtResource("2_proj")

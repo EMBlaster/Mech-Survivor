@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_script")
-enemy_name = "Atlas AS7-D"
+enemy_name = "Colossus CLS-7D"
 archetype = "boss"
 base_armor = 300.0
 base_speed = 25.0

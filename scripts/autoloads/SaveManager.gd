@@ -3,7 +3,7 @@ extends Node
 const SAVE_PATH = "user://save.cfg"
 
 var credits: int = 0
-var unlocked_mechs: Array[String] = ["Jenner JR7-D"]  # mech_name strings
+var unlocked_mechs: Array[String] = ["Jackal JKL-1A"]  # mech_name strings
 
 ## Inventory: item key -> quantity owned.
 var owned_weapons: Dictionary = {}      # key: weapon_key(WeaponDef)
@@ -37,7 +37,7 @@ func load_save() -> void:
 		save()  # first run -- write defaults
 		return
 	credits = config.get_value("pilot", "credits", 0)
-	unlocked_mechs.assign(config.get_value("pilot", "unlocked_mechs", ["Jenner JR7-D"]))
+	unlocked_mechs.assign(config.get_value("pilot", "unlocked_mechs", ["Jackal JKL-1A"]))
 	owned_weapons = config.get_value("inventory", "owned_weapons", {})
 	owned_equipment = config.get_value("inventory", "owned_equipment", {})
 	owned_ammo_bins = config.get_value("inventory", "owned_ammo_bins", {})

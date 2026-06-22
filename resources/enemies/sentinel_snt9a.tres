@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1_script")
-enemy_name = "Centurion CN9-A"
+enemy_name = "Sentinel SNT-9A"
 archetype = "brawler"
 base_armor = 80.0
 base_speed = 55.0

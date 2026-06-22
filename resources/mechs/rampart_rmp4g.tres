@@ -7,7 +7,7 @@
 
 [resource]
 script = ExtResource("1_script")
-mech_name = "Hunchback HBK-4G"
+mech_name = "Rampart RMP-4G"
 weight_class = "Medium"
 max_speed = 60.0
 max_armor = 160.0

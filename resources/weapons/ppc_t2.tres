@@ -5,12 +5,12 @@
 
 [resource]
 script = ExtResource("1_script")
-weapon_name = "PPC"
+weapon_name = "Particle Cannon"
 weapon_type = "laser"
 manufacturer = "Standard"
 tier = 2
 damage = 38.0
-range = 520.0
+fire_range = 520.0
 heat = 10.0
 projectile_speed = 700.0
 aoe_radius = 0.0

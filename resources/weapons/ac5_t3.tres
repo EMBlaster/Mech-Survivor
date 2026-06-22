@@ -5,12 +5,12 @@
 
 [resource]
 script = ExtResource("1_script")
-weapon_name = "AC/5"
+weapon_name = "Autocannon-5"
 weapon_type = "autocannon"
 manufacturer = "Standard"
 tier = 3
 damage = 17.0
-range = 450.0
+fire_range = 450.0
 heat = 1.0
 projectile_speed = 600.0
 aoe_radius = 0.0
