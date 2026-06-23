@@ -10,6 +10,15 @@ const EQUIPMENT_DIR := "res://resources/equipment/"
 const AMMO_DIR := "res://resources/ammo/"
 const MECH_DIR := "res://resources/mechs/"
 
+## Canonical ordered mech roster — single source of truth for all UI lists.
+const ROSTER: Array[MechDef] = [
+	preload("res://resources/mechs/jackal_jkl1a.tres"),
+	preload("res://resources/mechs/rampart_rmp4g.tres"),
+	preload("res://resources/mechs/ballista_bls_c1.tres"),
+	preload("res://resources/mechs/anvil_anv6r.tres"),
+	preload("res://resources/mechs/colossus_cls7d.tres"),
+]
+
 var weapons_by_key: Dictionary = {}
 var equipment_by_key: Dictionary = {}
 var ammo_bins_by_key: Dictionary = {}

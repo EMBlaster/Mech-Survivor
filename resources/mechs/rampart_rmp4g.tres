@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_script")
 mech_name = "Rampart RMP-4G"
+store_price = 1500
 weight_class = "Medium"
 max_speed = 60.0
 max_armor = 160.0

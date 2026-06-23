@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_script")
 mech_name = "Ballista BLS-C1"
+store_price = 2000
 weight_class = "Medium"
 max_speed = 65.0
 max_armor = 120.0

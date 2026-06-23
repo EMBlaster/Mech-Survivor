@@ -24,6 +24,7 @@ ItemDatabase="*res://scripts/autoloads/ItemDatabase.gd"
 SalvageSystem="*res://scripts/autoloads/SalvageSystem.gd"
 CraftingSystem="*res://scripts/autoloads/CraftingSystem.gd"
 MissionBoard="*res://scripts/autoloads/MissionBoard.gd"
+GeneralStore="*res://scripts/autoloads/GeneralStore.gd"
 
 [input]
 
@@ -95,6 +96,11 @@ menu_back={
 menu_retry={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":82,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+menu_general_store={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":71,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 

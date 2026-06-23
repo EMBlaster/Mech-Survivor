@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/game/Projectile.tscn" id="1_l56xx"]
+[ext_resource type="Script" path="res://scripts/WeaponDef.gd" id="2_6t62e"]
+
+[resource]
+script = ExtResource("2_6t62e")
+weapon_name = "Autocannon-5"
+weapon_type = "autocannon"
+manufacturer = ""
+tier = 2
+traits = Array[String](["damage_bonus"])
+damage = 10.579999999999998
+fire_range = 400.0
+heat = 0.95
+projectile_speed = 600.0
+projectile_scene = ExtResource("1_l56xx")
+weight = 9.0
+slot_cost = 4
+ammo_type = "ballistic"

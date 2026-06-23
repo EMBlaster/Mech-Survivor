@@ -10,6 +10,7 @@
 [resource]
 script = ExtResource("1_script")
 mech_name = "Colossus CLS-7D"
+store_price = 9000
 weight_class = "Assault"
 max_speed = 35.0
 max_armor = 320.0

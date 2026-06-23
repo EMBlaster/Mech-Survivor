@@ -181,3 +181,48 @@ func is_corp_dark(corp: String) -> bool:
 ## Returns true when a corp's rep is high enough to unlock their T2 store.
 func t2_store_unlocked(corp: String) -> bool:
 	return get_rep(corp) >= REP_T2_STORE_THRESHOLD
+
+## --- Mech roster ---
+
+const MAX_MECHS: int = 10
+
+func mech_count() -> int:
+	return unlocked_mechs.size()
+
+func can_buy_mech() -> bool:
+	return mech_count() < MAX_MECHS
+
+func buy_mech(mech: MechDef) -> bool:
+	if not spend_credits(mech.store_price):
+		return false
+	unlock_mech(mech.mech_name)
+	return true
+
+func sell_mech(mech: MechDef) -> void:
+	if mech.mech_name not in unlocked_mechs:
+		return
+	if mech_count() <= 1:
+		return
+	mech_loadouts.erase(mech.mech_name)
+	unlocked_mechs.erase(mech.mech_name)
+	add_credits(mech_sell_price(mech))
+
+func mech_sell_price(mech: MechDef) -> int:
+	return mech.store_price / 2
+
+## --- Weapon selling ---
+
+func sell_weapon(w: WeaponDef) -> bool:
+	var key := weapon_key(w)
+	var qty: int = owned_weapons.get(key, 0)
+	if qty <= 0:
+		return false
+	owned_weapons[key] = qty - 1
+	if owned_weapons[key] <= 0:
+		owned_weapons.erase(key)
+	add_credits(weapon_sell_price(w))
+	return true
+
+func weapon_sell_price(w: WeaponDef) -> int:
+	var base_prices := {1: 150, 2: 300, 3: 600, 4: 1200}
+	return base_prices.get(w.tier, 150) / 2

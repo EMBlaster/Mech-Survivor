@@ -1,13 +1,5 @@
 extends Control
 
-const MECH_DEFS: Array[MechDef] = [
-	preload("res://resources/mechs/jackal_jkl1a.tres"),
-	preload("res://resources/mechs/rampart_rmp4g.tres"),
-	preload("res://resources/mechs/ballista_bls_c1.tres"),
-	preload("res://resources/mechs/anvil_anv6r.tres"),
-	preload("res://resources/mechs/colossus_cls7d.tres"),
-]
-
 var selected_mech: MechDef = null
 var selected_mission: MissionDef = null
 var mech_buttons: Array[Button] = []
@@ -25,10 +17,16 @@ func _ready() -> void:
 	_build_layout()
 	_build_mech_buttons()
 	_build_mission_buttons()
-	_add_corp_store_button()
-	selected_mech = MECH_DEFS[0]
+	_add_store_buttons()
+	selected_mech = _first_unlocked_mech()
 	selected_mission = MissionBoard.available_missions[0]
 	_update_launch_state()
+
+func _first_unlocked_mech() -> MechDef:
+	for mech in ItemDatabase.ROSTER:
+		if SaveManager.is_unlocked(mech.mech_name):
+			return mech
+	return ItemDatabase.ROSTER[0]
 
 func _build_layout() -> void:
 	var hbox := HBoxContainer.new()
@@ -80,7 +78,7 @@ func _build_layout() -> void:
 	hbox.add_child(_action_col)
 
 	_credits_label = Label.new()
-	_credits_label.text = "Credits: %d" % SaveManager.credits
+	_credits_label.text = _credits_text()
 	_action_col.add_child(_credits_label)
 
 	var spacer := Control.new()
@@ -105,7 +103,7 @@ func _build_layout() -> void:
 # --- Mech buttons ---
 
 func _build_mech_buttons() -> void:
-	for mech in MECH_DEFS:
+	for mech in ItemDatabase.ROSTER:
 		var btn := Button.new()
 		btn.toggle_mode = true
 		btn.custom_minimum_size = Vector2(0, 175)
@@ -180,7 +178,7 @@ func _on_mech_pressed(mech: MechDef, btn: Button) -> void:
 		if SaveManager.spend_credits(mech.unlock_cost):
 			SaveManager.unlock_mech(mech.mech_name)
 			_update_mech_button_text(btn, mech)
-			_credits_label.text = "Credits: %d" % SaveManager.credits
+			_credits_label.text = _credits_text()
 		else:
 			btn.button_pressed = false
 			return
@@ -240,7 +238,13 @@ func _on_mech_lab_pressed() -> void:
 	GameState.current_mech = selected_mech
 	get_tree().change_scene_to_file("res://scenes/ui/MechLab.tscn")
 
-func _add_corp_store_button() -> void:
+func _add_store_buttons() -> void:
+	var gs_btn := Button.new()
+	gs_btn.text = "Store [G]"
+	gs_btn.pressed.connect(_on_general_store_pressed)
+	_action_col.add_child(gs_btn)
+	_action_col.move_child(gs_btn, _back_btn.get_index())
+
 	if SaveManager.corp_store_access.is_empty():
 		return
 	var corp_sym := ""
@@ -254,11 +258,18 @@ func _add_corp_store_button() -> void:
 	_action_col.add_child(btn)
 	_action_col.move_child(btn, _back_btn.get_index())
 
+func _on_general_store_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/ui/GenericStore.tscn")
+
 func _on_corp_store_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/CorpStore.tscn")
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")
+
+func _credits_text() -> String:
+	return "Credits: %d  |  Roster: %d/%d" % [
+		SaveManager.credits, SaveManager.mech_count(), SaveManager.MAX_MECHS]
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu_launch"):
@@ -266,6 +277,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_launch_pressed()
 	elif event.is_action_pressed("menu_mech_lab"):
 		_on_mech_lab_pressed()
+	elif event.is_action_pressed("menu_general_store"):
+		_on_general_store_pressed()
 	elif event.is_action_pressed("menu_corp_store"):
 		if not SaveManager.corp_store_access.is_empty():
 			_on_corp_store_pressed()

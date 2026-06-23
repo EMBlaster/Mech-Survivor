@@ -20,6 +20,7 @@ const ARMOR_WEIGHT_PER_POINT: float = 0.0625
 @export var heat_capacity: float = 30.0      # cosmetic bar only in PoC
 @export var starting_weapons: Array[WeaponDef] = []
 @export var unlock_cost: int = 0             # 0 = starter (Jackal)
+@export var store_price: int = 1000          # purchase price in General / Corp store
 @export var sprite: Texture2D
 
 @export_group("Loadout")

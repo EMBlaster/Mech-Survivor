@@ -4,13 +4,20 @@ const T1_SLOT_COUNT: int = 5
 const T2_SLOT_COUNT: int = 3
 const BASE_PRICE_T1: int = 200
 const BASE_PRICE_T2: int = 450
+const MECH_APPEAR_CHANCE: float = 0.10
+
+const CORP_MECH_POOL: Array[MechDef] = [
+	preload("res://resources/mechs/anvil_anv6r.tres"),
+	preload("res://resources/mechs/colossus_cls7d.tres"),
+]
 
 var _corp: CorpDef = null
 var _inventory: Array[WeaponDef] = []
+var _mech_stock: Array[MechDef] = []
 var _credits_label: Label = null
-## Tracks {weapon_key -> buy_btn} so affordability can refresh after each purchase.
 var _buy_buttons: Dictionary = {}
 var _bought_keys: Array[String] = []
+var _content_list: VBoxContainer = null
 
 func _ready() -> void:
 	anchor_right = 1.0
@@ -20,6 +27,7 @@ func _ready() -> void:
 		get_tree().change_scene_to_file("res://scenes/ui/MechSelect.tscn")
 		return
 	_inventory = _build_inventory()
+	_mech_stock = _pick_mechs()
 	_build_ui()
 
 func _find_corp(corp_name: String) -> CorpDef:
@@ -37,6 +45,8 @@ func _build_inventory() -> Array[WeaponDef]:
 	for w in all:
 		if not w is WeaponDef:
 			continue
+		if not (w.manufacturer.is_empty() or w.manufacturer == "Standard"):
+			continue
 		if w.tier == 1:
 			t1.append(w)
 		elif w.tier == 2:
@@ -51,10 +61,20 @@ func _build_inventory() -> Array[WeaponDef]:
 			result.append(_brand(t2[i]))
 	return result
 
+func _pick_mechs() -> Array[MechDef]:
+	var result: Array[MechDef] = []
+	for mech in CORP_MECH_POOL:
+		if randf() < MECH_APPEAR_CHANCE:
+			result.append(mech)
+	return result
+
 func _brand(base: WeaponDef) -> WeaponDef:
 	var w: WeaponDef = base.duplicate(false) as WeaponDef
 	w.manufacturer = _corp.corp_name
-	w.traits = _corp.trait_pool.duplicate()
+	var pool: Array = _corp.trait_pool.duplicate()
+	pool.shuffle()
+	var max_traits: int = mini(w.tier, pool.size())
+	w.traits = pool.slice(0, randi_range(0, max_traits))
 	return w
 
 func _weapon_tooltip(w: WeaponDef) -> String:
@@ -131,14 +151,12 @@ func _build_ui() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(scroll)
 
-	var item_list := VBoxContainer.new()
-	item_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	item_list.add_theme_constant_override("separation", 4)
-	scroll.add_child(item_list)
+	_content_list = VBoxContainer.new()
+	_content_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_content_list.add_theme_constant_override("separation", 4)
+	scroll.add_child(_content_list)
 
-	for weapon in _inventory:
-		item_list.add_child(_build_weapon_row(weapon))
-		item_list.add_child(HSeparator.new())
+	_rebuild_content()
 
 	root.add_child(HSeparator.new())
 
@@ -146,6 +164,46 @@ func _build_ui() -> void:
 	leave_btn.text = "Leave Store [Esc]"
 	leave_btn.pressed.connect(_on_leave_pressed)
 	root.add_child(leave_btn)
+
+func _rebuild_content() -> void:
+	for c in _content_list.get_children():
+		c.queue_free()
+	_buy_buttons.clear()
+
+	_add_section_label("FOR SALE  —  WEAPONS")
+	for weapon in _inventory:
+		_content_list.add_child(_build_weapon_row(weapon))
+		_content_list.add_child(HSeparator.new())
+
+	if not _mech_stock.is_empty():
+		_add_section_label("FOR SALE  —  MECHS")
+		for mech in _mech_stock:
+			_content_list.add_child(_build_buy_mech_row(mech))
+		_content_list.add_child(HSeparator.new())
+
+	_add_section_label("SELL INVENTORY")
+	var has_items := false
+	for key in SaveManager.owned_weapons:
+		var qty: int = SaveManager.owned_weapons[key]
+		if qty <= 0:
+			continue
+		var w: WeaponDef = ItemDatabase.weapons_by_key.get(key)
+		if w == null:
+			continue
+		_content_list.add_child(_build_sell_weapon_row(w, qty))
+		has_items = true
+	for mech in ItemDatabase.ROSTER:
+		if not SaveManager.is_unlocked(mech.mech_name):
+			continue
+		_content_list.add_child(_build_sell_mech_row(mech))
+		has_items = true
+	if not has_items:
+		_add_section_label("(nothing to sell)")
+
+func _add_section_label(text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	_content_list.add_child(lbl)
 
 func _build_weapon_row(weapon: WeaponDef) -> Control:
 	var row := HBoxContainer.new()
@@ -201,7 +259,126 @@ func _build_weapon_row(weapon: WeaponDef) -> Control:
 	_buy_buttons[wkey] = {"btn": buy_btn, "price": price}
 	return row
 
+func _build_buy_mech_row(mech: MechDef) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(info)
+
+	var name_lbl := Label.new()
+	name_lbl.text = "%s %s  [%s]" % [_corp.symbol, mech.mech_name, mech.weight_class]
+	info.add_child(name_lbl)
+
+	var stats_lbl := Label.new()
+	stats_lbl.text = "HP: %.0f  Speed: %.0f  Tonnage: %.0ft" % [
+		mech.max_armor, mech.max_speed, mech.free_tonnage]
+	info.add_child(stats_lbl)
+
+	var right := VBoxContainer.new()
+	right.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(right)
+
+	var price_lbl := Label.new()
+	price_lbl.text = "%d cr" % mech.store_price
+	right.add_child(price_lbl)
+
+	var already_owned := SaveManager.is_unlocked(mech.mech_name)
+	var buy_btn := Button.new()
+	buy_btn.custom_minimum_size = Vector2(100, 0)
+	if already_owned:
+		buy_btn.text = "Owned"
+		buy_btn.disabled = true
+	else:
+		buy_btn.text = "Buy"
+		buy_btn.disabled = SaveManager.credits < mech.store_price or not SaveManager.can_buy_mech()
+		buy_btn.pressed.connect(_on_buy_mech.bind(mech))
+	right.add_child(buy_btn)
+	return row
+
+func _build_sell_weapon_row(w: WeaponDef, qty: int) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(info)
+
+	var name_lbl := Label.new()
+	var sym := ""
+	for corp in MissionBoard.CORPS:
+		if corp.corp_name == w.manufacturer and not corp.symbol.is_empty():
+			sym = corp.symbol + " "
+			break
+	name_lbl.text = "%s%s  x%d" % [sym, w.weapon_name, qty]
+	name_lbl.add_theme_color_override("font_color", _tier_color(w.tier))
+	info.add_child(name_lbl)
+
+	var right := VBoxContainer.new()
+	right.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(right)
+
+	var sell_price := SaveManager.weapon_sell_price(w)
+	var price_lbl := Label.new()
+	price_lbl.text = "%d cr" % sell_price
+	right.add_child(price_lbl)
+
+	var sell_btn := Button.new()
+	sell_btn.text = "Sell"
+	sell_btn.custom_minimum_size = Vector2(80, 0)
+	sell_btn.pressed.connect(_on_sell_weapon.bind(w))
+	right.add_child(sell_btn)
+	return row
+
+func _build_sell_mech_row(mech: MechDef) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(info)
+
+	var name_lbl := Label.new()
+	name_lbl.text = "%s  [%s]" % [mech.mech_name, mech.weight_class]
+	info.add_child(name_lbl)
+
+	var warn_lbl := Label.new()
+	warn_lbl.text = "Equipped weapons sell with the mech — strip in MechLab first"
+	info.add_child(warn_lbl)
+
+	var right := VBoxContainer.new()
+	right.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(right)
+
+	var price_lbl := Label.new()
+	price_lbl.text = "%d cr" % SaveManager.mech_sell_price(mech)
+	right.add_child(price_lbl)
+
+	var sell_btn := Button.new()
+	sell_btn.text = "Sell"
+	sell_btn.custom_minimum_size = Vector2(80, 0)
+	sell_btn.disabled = SaveManager.mech_count() <= 1
+	sell_btn.pressed.connect(_on_sell_mech.bind(mech))
+	right.add_child(sell_btn)
+	return row
+
 # --- Interactions ---
+
+func _on_buy_mech(mech: MechDef) -> void:
+	if SaveManager.buy_mech(mech):
+		_refresh_credits_label()
+		_rebuild_content()
+
+func _on_sell_weapon(w: WeaponDef) -> void:
+	SaveManager.sell_weapon(w)
+	_refresh_credits_label()
+	_rebuild_content()
+
+func _on_sell_mech(mech: MechDef) -> void:
+	SaveManager.sell_mech(mech)
+	_refresh_credits_label()
+	_rebuild_content()
 
 func _on_buy_pressed(weapon: WeaponDef, price: int, wkey: String, buy_btn: Button) -> void:
 	if not SaveManager.spend_credits(price):

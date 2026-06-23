@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1_script")
 mech_name = "Anvil ANV-6R"
+store_price = 5000
 weight_class = "Heavy"
 max_speed = 55.0
 max_armor = 180.0
